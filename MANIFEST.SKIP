@@ -1,0 +1,6 @@
+\.swp$
+\.swo$
+\.bak$
+\.git
+blib
+^MYMETA.yml$
