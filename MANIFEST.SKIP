@@ -4,3 +4,4 @@
 \.git
 blib
 ^MYMETA.yml$
+dzil.ini
