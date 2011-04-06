@@ -4,7 +4,7 @@ $HTML::Template::VERSION = '2.9';
 
 =head1 NAME
 
-HTML::Template - Perl module to use HTML Templates from CGI scripts
+HTML::Template - Perl module to use HTML-like templating language
 
 =head1 SYNOPSIS
 
