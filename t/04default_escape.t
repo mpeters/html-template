@@ -4,18 +4,18 @@ use HTML::Template;
 
 use strict;
 
-while( <DATA> )
-{
+while (<DATA>) {
     chomp;
     next if /^$/;
     next if /^#/;
-    my($text,$given,$wanted) = split /\|/;
+    my ($text, $given, $wanted) = split /\|/;
     my $template = HTML::Template->new(
-                                       scalarref => \$text,
-                                       default_escape => "HTML" );
+        scalarref      => \$text,
+        default_escape => "HTML"
+    );
     $template->param(foo => $given);
     my $output = $template->output;
-    is($output , $wanted , $text);
+    is($output, $wanted, $text);
 }
 
 # use pipe as the seperator between fields.

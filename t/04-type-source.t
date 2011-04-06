@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use Test::More 
-# qw(no_plan);
-tests => 5;
+use Test::More
+  # qw(no_plan);
+  tests => 5;
 
 BEGIN {
     use_ok('HTML::Template');
@@ -12,8 +12,8 @@ my ($fh, $template_string, @template_array);
 my ($typetemplate, $stemplate, $atemplate, $fhtemplate);
 my ($output);
 
-open $fh, 'templates/simple.tmpl' 
-    or die "Couldn't open simple.tmpl for reading: $!";
+open $fh, 'templates/simple.tmpl'
+  or die "Couldn't open simple.tmpl for reading: $!";
 {
     local $/;
     $template_string = <$fh>;
@@ -25,13 +25,13 @@ seek $fh, 0, 0;
 
 # next is same as at t/99-old-test-pl.t line 48
 $typetemplate = HTML::Template->new(
-     type => 'filename',
-     path => 'templates',
-     source => 'simple.tmpl',
-     debug => 0
+    type   => 'filename',
+    path   => 'templates',
+    source => 'simple.tmpl',
+    debug  => 0
 );
 
-# next 3 HTML::Template objects are same as above, only testing each 
+# next 3 HTML::Template objects are same as above, only testing each
 # variant of the 'type' option
 $stemplate = HTML::Template->new(
     type   => 'scalarref',
@@ -51,16 +51,13 @@ $fhtemplate = HTML::Template->new(
     debug  => 0,
 );
 
-for my $tmpl (
-    $typetemplate,
-    $stemplate, 
-    $atemplate, 
-    $fhtemplate, 
-) {
+for my $tmpl ($typetemplate, $stemplate, $atemplate, $fhtemplate,) {
     $tmpl->param('ADJECTIVE', 'very');
-    $output =  $tmpl->output;
-    ok( ($output !~ /ADJECTIVE/ and $tmpl->param('ADJECTIVE') eq 'very'),
-        "'type-source' version of constructor functioning properly");
+    $output = $tmpl->output;
+    ok(
+        ($output !~ /ADJECTIVE/ and $tmpl->param('ADJECTIVE') eq 'very'),
+        "'type-source' version of constructor functioning properly"
+    );
 }
 
 =head1 NAME
@@ -87,5 +84,4 @@ Test the 'type-source' style of constructor C<HTML::Template::new()>.
     );
 
 =cut
-
 

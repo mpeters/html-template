@@ -10,11 +10,13 @@ my $template = HTML::Template->new(
 my @results = sort $template->query();
 is_deeply(\@results, [qw(example_loop var)], 'no args, returns top level items');
 
-is($template->query(name => 'var'), 'VAR', 'name for a variable');
+is($template->query(name => 'var'),          'VAR',  'name for a variable');
 is($template->query(name => 'example_loop'), 'LOOP', 'name for a loop');
 is($template->query(name => ['example_loop', 'bop']), 'VAR', 'name for a var inside a loop');
-is($template->query(name => ['example_loop', 'example_inner_loop']), 'LOOP', 'name for a loop inside a loop');
-is($template->query(name => ['example_loop', 'example_inner_loop', 'inner_bee']), 'VAR', 'name for a var inside a loop inside a loop');
+is($template->query(name => ['example_loop', 'example_inner_loop']),
+    'LOOP', 'name for a loop inside a loop');
+is($template->query(name => ['example_loop', 'example_inner_loop', 'inner_bee']),
+    'VAR', 'name for a var inside a loop inside a loop');
 
 @results = sort $template->query(loop => 'example_loop');
 is_deeply(\@results, [qw(bee bop example_inner_loop)], 'loop on an outer loop');
@@ -33,9 +35,12 @@ is_deeply(\@results, [qw(loop_foo)], 'no args, returns only top level item');
 
 is($template->query(name => 'loop_foo'), 'LOOP', 'name for a loop');
 is($template->query(name => ['loop_foo', 'loop_bar']), 'LOOP', 'name for a loop inside a loop');
-is($template->query(name => ['loop_foo', 'loop_bar', 'foo']), 'VAR', 'name for a var inside loop inside a loop');
-is($template->query(name => ['loop_foo', 'loop_bar', 'bar']), 'VAR', 'name for a var inside loop inside a loop');
-is($template->query(name => ['loop_foo', 'loop_bar', 'bash']), 'VAR', 'name for a var inside loop inside a loop');
+is($template->query(name => ['loop_foo', 'loop_bar', 'foo']),
+    'VAR', 'name for a var inside loop inside a loop');
+is($template->query(name => ['loop_foo', 'loop_bar', 'bar']),
+    'VAR', 'name for a var inside loop inside a loop');
+is($template->query(name => ['loop_foo', 'loop_bar', 'bash']),
+    'VAR', 'name for a var inside loop inside a loop');
 
 @results = sort $template->query(loop => 'loop_foo');
 is_deeply(\@results, [qw(loop_bar)], 'loop on a loop');

@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-use Test::More 
-# qw(no_plan);
-tests => 4;
+use Test::More
+  # qw(no_plan);
+  tests => 4;
 
 use_ok('HTML::Template');
 
@@ -10,8 +10,8 @@ my ($fh, $template_string, @template_array);
 my ($template);
 my ($type, $cache_option);
 
-open $fh, 'templates/simple.tmpl' 
-    or die "Couldn't open simple.tmpl for reading: $!";
+open $fh, 'templates/simple.tmpl'
+  or die "Couldn't open simple.tmpl for reading: $!";
 {
     local $/;
     $template_string = <$fh>;
@@ -21,25 +21,20 @@ open $fh, 'templates/simple.tmpl'
 @template_array = <$fh>;
 seek $fh, 0, 0;
 
-test_caching_precluded('scalarref', \$template_string, 'cache');
-test_caching_precluded('arrayref', \@template_array, 'double_cache');
-test_caching_precluded('filehandle', $fh, 'file_cache');
+test_caching_precluded('scalarref',  \$template_string, 'cache');
+test_caching_precluded('arrayref',   \@template_array,  'double_cache');
+test_caching_precluded('filehandle', $fh,               'file_cache');
 
 sub test_caching_precluded {
     my ($type, $source, $cache_option) = @_;
     my ($template);
-    eval {
-        $template = HTML::Template->new(
-            type   => $type,
-            source => $source,
-            $cache_option => 1,
-        );
-    };
-    like( $@,
-      qr/Cannot have caching when template source is not file/,
-      "Cannot have caching when template source is not file");
+    eval { $template = HTML::Template->new(type => $type, source => $source, $cache_option => 1,); };
+    like(
+        $@,
+        qr/Cannot have caching when template source is not file/,
+        "Cannot have caching when template source is not file"
+    );
 }
-
 
 =head1 NAME
 

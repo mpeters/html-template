@@ -4,45 +4,53 @@ use Test::More qw(no_plan);
 use_ok('HTML::Template');
 
 my $tmpl;
-eval{$tmpl = HTML::Template->new()};
-like($@,
-        qr/\QHTML::Template->new called with multiple (or no) template sources specified!/,
-        'new() with no args dies');
+eval { $tmpl = HTML::Template->new() };
+like(
+    $@,
+    qr/\QHTML::Template->new called with multiple (or no) template sources specified!/,
+    'new() with no args dies'
+);
 
-eval{$tmpl = HTML::Template->new('file')};
-like($@,
-        qr/\QHTML::Template->new() called with odd number of option parameters/,
-        'new() with odd number of args dies');
+eval { $tmpl = HTML::Template->new('file') };
+like(
+    $@,
+    qr/\QHTML::Template->new() called with odd number of option parameters/,
+    'new() with odd number of args dies'
+);
 
-eval{$tmpl = HTML::Template->new(type => 'filename')};
-like($@,
-        qr/\Qcalled with 'type' parameter set, but no 'source'!/,
-        "new(type => 'filename') dies without source");
+eval { $tmpl = HTML::Template->new(type => 'filename') };
+like(
+    $@,
+    qr/\Qcalled with 'type' parameter set, but no 'source'!/,
+    "new(type => 'filename') dies without source"
+);
 
-eval{$tmpl = HTML::Template->new(
-                                 type => 'frobnitz',
-                                 source => '../templates/simple.tmpl'
-                                 )};
-like($@,
-        qr/\Qtype parameter must be set to 'filename', 'arrayref', 'scalarref' or 'filehandle'!/,
-        'new() dies with invalid type');
+eval { $tmpl = HTML::Template->new(type => 'frobnitz', source => '../templates/simple.tmpl') };
+like(
+    $@,
+    qr/\Qtype parameter must be set to 'filename', 'arrayref', 'scalarref' or 'filehandle'!/,
+    'new() dies with invalid type'
+);
 
-eval{$tmpl = HTML::Template->new(filename => 'simple.tmpl',
-                                 path => 'templates',
-                                 associate => 'Class::With::No::Param'
-                                 )};
-like($@,
-qr/called with associate option, containing object of type.*\Qwhich lacks a param() method!/,
-'associate() object with no param() method');
+eval {
+    $tmpl = HTML::Template->new(
+        filename  => 'simple.tmpl',
+        path      => 'templates',
+        associate => 'Class::With::No::Param'
+    );
+};
+like(
+    $@,
+    qr/called with associate option, containing object of type.*\Qwhich lacks a param() method!/,
+    'associate() object with no param() method'
+);
 
-eval{$tmpl = HTML::Template->new(
-                                 filename => 'simple.tmpl',
-                                 path => 'templates',
-                                 'debug'
-                                 )};
-like($@,
-qr/\Qcalled with odd number of option parameters - should be of the form option => value/,
-'new() called with option with no value');
+eval { $tmpl = HTML::Template->new(filename => 'simple.tmpl', path => 'templates', 'debug') };
+like(
+    $@,
+    qr/\Qcalled with odd number of option parameters - should be of the form option => value/,
+    'new() called with option with no value'
+);
 
 =head1 NAME
 

@@ -12,9 +12,11 @@ my $text = <<END;
 </tmpl_loop>
 END
 
-my $template = HTML::Template->new(scalarref         => \$text,
-                                   die_on_bad_params => 0,
-                                   global_vars       => 1);
+my $template = HTML::Template->new(
+    scalarref         => \$text,
+    die_on_bad_params => 0,
+    global_vars       => 1
+);
 $template->param(outer => [{foo => 1, inner => [{hell => [{}]}]}]);
 my $output = $template->output;
 
@@ -30,18 +32,13 @@ my $text2 = <<END;
 </TMPL_LOOP>
 END
 
-$template =
-  HTML::Template->new(scalarref         => \$text2,
-                      die_on_bad_params => 0,
-                      global_vars       => 1);
+$template = HTML::Template->new(
+    scalarref         => \$text2,
+    die_on_bad_params => 0,
+    global_vars       => 1
+);
 
 $template->param(BLA => 'bla1');
-$template->param(OUTER_LOOP => [{INNER_LOOP => [{INNER_LOOP2 => [
-                                                             {BLA4 => 'test'},
-                                                 ]
-                                                }
-                                               ]
-                                }
-                               ]);
+$template->param(OUTER_LOOP => [{INNER_LOOP => [{INNER_LOOP2 => [{BLA4 => 'test'},]}]}]);
 $output = $template->output;
 like($output, qr/bla1.*bla1/s);
