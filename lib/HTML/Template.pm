@@ -645,7 +645,7 @@ separated by the forward-slash character ('/').
 open_mode - you can set this option to an opening mode with which all
 template files will be opened. 
 
-For example:
+For example, if you want to use a template that is UTF8 encoded unicode:
 
     my $template = HTML::Template->new( filename => 'file.tmpl',
                                         open_mode => '<:encoding(utf-8)'
@@ -654,9 +654,9 @@ For example:
 That way you can force a charset, CR/LF properties etc. on the template
 files. See L<PerlIO> for details.
 
-NOTE: this only works in perl 5.7.1 and above. 
+B<NOTE>: this only works in perl 5.7.1 and above. 
 
-SECOND NOTE: you have to supply an opening mode that actually permits
+B<SECOND NOTE>: you have to supply an opening mode that actually permits
 reading from the file handle.
 
 =item *
