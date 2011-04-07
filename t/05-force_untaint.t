@@ -1,8 +1,7 @@
 #!perl -T
-
-use Test::More tests => 3;
-use HTML::Template;
+use Test::More ($] < 5.008000 ? (skip_all => 'force_untaint needs at least perl 5.8.0') : (tests => 4));
 use Scalar::Util qw(tainted);
+use_ok('HTML::Template');
 
 my $text = qq{ <TMPL_VAR NAME="a"> };
 
@@ -17,16 +16,13 @@ my $template = HTML::Template->new(
 ok(tainted($ENV{PATH}), "PATH environment variable must be set and tainted for these tests");
 
 $template->param(a => $ENV{PATH});
-eval { $template->output(); };
+eval { $template->output() };
 
 like($@, qr/tainted value with 'force_untaint' option/, "set tainted value despite option force_untaint");
 
-sub tainter {    # coderef that returns a tainted value
-    return $ENV{PATH};
-}
-
-$template->param(a => \&tainter);
-eval { $template->output(); };
+# coderef that returns a tainted value
+$template->param(a => sub { return $ENV{PATH} });
+eval { $template->output() };
 
 like(
     $@,

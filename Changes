@@ -6,6 +6,9 @@
 
    - Documenation: Using more POD formatting
 
+   - Bug Fix: RT #26456 - force_untaint can't work in Perl < 5.8.0
+     [admin@photoresearchers.com]
+
    - Test Fix: RT #26103 - t/05-blind-cache.t no longer modifies the
      distribution during the tests but instead uses temp files [Jan
      Dubois and Michael Peters]
