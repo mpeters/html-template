@@ -3,5 +3,6 @@
 \.bak$
 \.git
 blib
+\.build$
 ^MYMETA.yml$
 dzil.ini
