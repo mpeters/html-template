@@ -4,8 +4,7 @@ use Test::More qw(no_plan);
 use_ok('HTML::Template');
 
 my ($output, $template, $result);
-my ($fh, $template_string, @template_array, $stemplate, $atemplate, $ftemplate, $fhtemplate,
-    $typetemplate);
+my ($fh, $template_string, @template_array, $stemplate, $atemplate, $ftemplate, $fhtemplate, $typetemplate);
 
 $template = HTML::Template->new(
     path     => 'templates',

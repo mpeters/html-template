@@ -35,14 +35,12 @@ $template->param('PHONE',         '212-929-4315');
 $template->param('PHONE2',        '');
 $template->param('SUBCATEGORIES', 'kfldjaldsf');
 $template->param('DESCRIPTION',
-    "dsa;kljkldasfjkldsajflkjdsfklfjdsgkfld\nalskdjklajsdlkajfdlkjsfd\n\talksjdklajsfdkljdsf\ndsa;klfjdskfj"
-);
+    "dsa;kljkldasfjkldsajflkjdsfklfjdsgkfld\nalskdjklajsdlkajfdlkjsfd\n\talksjdklajsfdkljdsf\ndsa;klfjdskfj");
 $template->param('WEBSITE',       'http://www.assforyou.com/');
 $template->param('INTRANET_URL',  'http://www.something.com');
 $template->param('REMOVE_BUTTON', "<INPUT TYPE=SUBMIT NAME=command VALUE=\"Remove Office\">");
 $template->param('COMPANY_ADMIN_AREA',
-    "<A HREF=administrator.cgi?office_id={office_id}&command=manage>Manage Office Administrators</A>"
-);
+    "<A HREF=administrator.cgi?office_id={office_id}&command=manage>Manage Office Administrators</A>");
 $template->param('CASESTUDIES_LIST',
     "adsfkljdskldszfgfdfdsgdsfgfdshghdmfldkgjfhdskjfhdskjhfkhdsakgagsfjhbvdsaj hsgbf jhfg sajfjdsag ffasfj hfkjhsdkjhdsakjfhkj kjhdsfkjhdskfjhdskjfkjsda kjjsafdkjhds kjds fkj skjh fdskjhfkj kj kjhf kjh sfkjhadsfkj hadskjfhkjhs ajhdsfkj akj fkj kj kj  kkjdsfhk skjhadskfj haskjh fkjsahfkjhsfk ksjfhdkjh sfkjhdskjfhakj shiou weryheuwnjcinuc 3289u4234k 5 i 43iundsinfinafiunai saiufhiudsaf afiuhahfwefna uwhf u auiu uh weiuhfiuh iau huwehiucnaiuncianweciuninc iuaciun iucniunciunweiucniuwnciwe"
 );
@@ -265,15 +263,7 @@ $template = HTML::Template->new(
     #debug => 1,
     #debug_stack => 1
 );
-$template->param(
-    FRUIT => [
-        {KIND => 'Apples'},
-        {KIND => 'Oranges'},
-        {KIND => 'Brains'},
-        {KIND => 'Toes'},
-        {KIND => 'Kiwi'}
-    ]
-);
+$template->param(FRUIT => [{KIND => 'Apples'}, {KIND => 'Oranges'}, {KIND => 'Brains'}, {KIND => 'Toes'}, {KIND => 'Kiwi'}]);
 $template->param(PINGPONG => [{}, {}, {}, {}, {}, {}]);
 
 $output = $template->output;
@@ -472,13 +462,7 @@ $output = $template->output;
 ok($output =~ /9/ and $output =~ /6/);
 
 # test no_includes
-eval {
-    $template = HTML::Template->new(
-        path        => ['templates/'],
-        filename    => 'include.tmpl',
-        no_includes => 1,
-    );
-};
+eval { $template = HTML::Template->new(path => ['templates/'], filename => 'include.tmpl', no_includes => 1,); };
 ok(defined $@ and $@ =~ /no_includes/);
 
 # test file cache - non automated, requires turning on debug watching STDERR!
@@ -726,12 +710,7 @@ $template = HTML::Template->new(
     loop_context_vars => 1
 );
 $template->param(foo => [{a => 'a'}, {a => 'b'}, {a => 'c'}]);
-$template->param(
-    outer => [
-        {inner => [{a => 'a'}, {a => 'b'}, {a => 'c'}]},
-        {inner => [{a => 'x'}, {a => 'y'}, {a => 'z'}]},
-    ]
-);
+$template->param(outer => [{inner => [{a => 'a'}, {a => 'b'}, {a => 'c'}]}, {inner => [{a => 'x'}, {a => 'y'}, {a => 'z'}]},]);
 $output = $template->output;
 ok($output =~ /^1a2b3c$/m);
 ok($output =~ /^11a2b3c21x2y3z$/m);
@@ -849,11 +828,5 @@ like($output, qr{^Joined&amp;with&quot;cruft});
 like($output, qr{&lt;&amp;&gt;&gt;&amp;&lt;});
 like($output, qr{because it's &lt;b&gt;});
 
-eval {
-    $template = HTML::Template->new(
-        path           => ['templates'],
-        filename       => 'default_escape.tmpl',
-        default_escape => 'wml'
-    );
-};
+eval { $template = HTML::Template->new(path => ['templates'], filename => 'default_escape.tmpl', default_escape => 'wml'); };
 like($@, qr/Invalid setting for default_escape/);

@@ -29,11 +29,7 @@ sub test_caching_precluded {
     my ($type, $source, $cache_option) = @_;
     my ($template);
     eval { $template = HTML::Template->new(type => $type, source => $source, $cache_option => 1,); };
-    like(
-        $@,
-        qr/Cannot have caching when template source is not file/,
-        "Cannot have caching when template source is not file"
-    );
+    like($@, qr/Cannot have caching when template source is not file/, "Cannot have caching when template source is not file");
 }
 
 =head1 NAME

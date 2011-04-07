@@ -1036,9 +1036,7 @@ sub new {
               or $options->{type} eq 'arrayref'
               or $options->{type} eq 'filehandle'
           )
-          or croak(
-            "HTML::Template->new() : type parameter must be set to 'filename', 'arrayref', 'scalarref' or 'filehandle'!"
-          );
+          or croak("HTML::Template->new() : type parameter must be set to 'filename', 'arrayref', 'scalarref' or 'filehandle'!");
 
         $options->{$options->{type}} = $options->{source};
         delete $options->{type};
@@ -1047,9 +1045,7 @@ sub new {
 
     # make sure taint mode is on if force_untaint flag is set
     if ($options->{force_untaint} && !${^TAINT}) {
-        croak(
-            "HTML::Template->new() : 'force_untaint' option set but perl does not run in taint mode!"
-        );
+        croak("HTML::Template->new() : 'force_untaint' option set but perl does not run in taint mode!");
     }
 
     # associate should be an array of one element if it's not
@@ -1105,13 +1101,11 @@ sub new {
     if ($options->{memory_debug}) {
         # memory_debug needs GTop
         eval { require GTop; };
-        croak(
-            "Could not load GTop.  You must have GTop installed to use HTML::Template in memory_debug mode.  The error was: $@"
-        ) if ($@);
+        croak("Could not load GTop.  You must have GTop installed to use HTML::Template in memory_debug mode.  The error was: $@")
+          if ($@);
         $self->{gtop}     = GTop->new();
         $self->{proc_mem} = $self->{gtop}->proc_mem($$);
-        print STDERR "\n### HTML::Template Memory Debug ### START ", $self->{proc_mem}->size(),
-          "\n";
+        print STDERR "\n### HTML::Template Memory Debug ### START ", $self->{proc_mem}->size(), "\n";
     }
 
     if ($options->{file_cache}) {
@@ -1156,19 +1150,17 @@ sub new {
     }
 
     # no 3 args form of open before perl 5.7.1
-    if($options->{open_mode} && $] < 5.007001) {
+    if ($options->{open_mode} && $] < 5.007001) {
         croak("HTML::Template->new(): open_mode cannot be used in Perl < 5.7.1");
     }
 
-    print STDERR "### HTML::Template Memory Debug ### POST CACHE INIT ", $self->{proc_mem}->size(),
-      "\n"
+    print STDERR "### HTML::Template Memory Debug ### POST CACHE INIT ", $self->{proc_mem}->size(), "\n"
       if $options->{memory_debug};
 
     # initialize data structures
     $self->_init;
 
-    print STDERR "### HTML::Template Memory Debug ### POST _INIT CALL ", $self->{proc_mem}->size(),
-      "\n"
+    print STDERR "### HTML::Template Memory Debug ### POST _INIT CALL ", $self->{proc_mem}->size(), "\n"
       if $options->{memory_debug};
 
     # drop the shared cache - leaving out this step results in the
@@ -1185,9 +1177,7 @@ sub _load_supplied_options {
     my $options = shift;
     for (my $x = 0 ; $x < @{$argsref} ; $x += 2) {
         defined(${$argsref}[($x + 1)])
-          or croak(
-            "HTML::Template->new() called with odd number of option parameters - should be of the form option => value"
-          );
+          or croak("HTML::Template->new() called with odd number of option parameters - should be of the form option => value");
         $options->{lc(${$argsref}[$x])} = ${$argsref}[($x + 1)];
     }
     return $options;
@@ -1421,8 +1411,7 @@ sub _get_cache_filename {
     if (wantarray) {
         return (substr($hash, 0, 2), substr($hash, 2));
     } else {
-        return File::Spec->join($self->{options}{file_cache_dir}, substr($hash, 0, 2),
-            substr($hash, 2));
+        return File::Spec->join($self->{options}{file_cache_dir}, substr($hash, 0, 2), substr($hash, 2));
     }
 }
 
@@ -1438,15 +1427,12 @@ sub _fetch_from_file_cache {
     return unless -e $cache_filename;
 
     eval { $self->{record} = Storable::lock_retrieve($cache_filename); };
-    croak(
-        "HTML::Template::new() - Problem reading cache file $cache_filename (file_cache => 1) : $@")
+    croak("HTML::Template::new() - Problem reading cache file $cache_filename (file_cache => 1) : $@")
       if $@;
-    croak(
-        "HTML::Template::new() - Problem reading cache file $cache_filename (file_cache => 1) : $!")
+    croak("HTML::Template::new() - Problem reading cache file $cache_filename (file_cache => 1) : $!")
       unless defined $self->{record};
 
-    ($self->{mtime}, $self->{included_mtimes}, $self->{param_map}, $self->{parse_stack}) =
-      @{$self->{record}};
+    ($self->{mtime}, $self->{included_mtimes}, $self->{param_map}, $self->{parse_stack}) = @{$self->{record}};
 
     $options->{filepath} = $filepath;
 
@@ -1458,10 +1444,8 @@ sub _fetch_from_file_cache {
             and ($mtime != $self->{mtime}))
         {
             $options->{cache_debug}
-              and print STDERR
-              "### HTML::Template Cache Debug ### FILE CACHE MISS : $filepath : $mtime\n";
-            ($self->{mtime}, $self->{included_mtimes}, $self->{param_map}, $self->{parse_stack}) =
-              (undef, undef, undef, undef);
+              and print STDERR "### HTML::Template Cache Debug ### FILE CACHE MISS : $filepath : $mtime\n";
+            ($self->{mtime}, $self->{included_mtimes}, $self->{param_map}, $self->{parse_stack}) = (undef, undef, undef, undef);
             return;
         }
 
@@ -1477,10 +1461,8 @@ sub _fetch_from_file_cache {
                     $options->{cache_debug}
                       and print STDERR
                       "### HTML::Template Cache Debug ### FILE CACHE MISS : $filepath : INCLUDE $filename : $included_mtime\n";
-                    (
-                        $self->{mtime},     $self->{included_mtimes},
-                        $self->{param_map}, $self->{parse_stack}
-                    ) = (undef, undef, undef, undef);
+                    ($self->{mtime}, $self->{included_mtimes}, $self->{param_map}, $self->{parse_stack}) =
+                      (undef, undef, undef, undef);
                     return;
                 }
             }
@@ -1503,9 +1485,8 @@ sub _commit_to_file_cache {
     my $filepath = $options->{filepath};
     if (not defined $filepath) {
         $filepath = $self->_find_file($options->{filename});
-        confess(
-            "HTML::Template->new() : Cannot open included file $options->{filename} : file not found."
-        ) unless defined($filepath);
+        confess("HTML::Template->new() : Cannot open included file $options->{filename} : file not found.")
+          unless defined($filepath);
         $options->{filepath} = $filepath;
     }
 
@@ -1514,30 +1495,23 @@ sub _commit_to_file_cache {
     if (not -d $cache_dir) {
         if (not -d $options->{file_cache_dir}) {
             mkdir($options->{file_cache_dir}, $options->{file_cache_dir_mode})
-              or croak(
-                "HTML::Template->new() : can't mkdir $options->{file_cache_dir} (file_cache => 1): $!"
-              );
+              or croak("HTML::Template->new() : can't mkdir $options->{file_cache_dir} (file_cache => 1): $!");
         }
         mkdir($cache_dir, $options->{file_cache_dir_mode})
           or croak("HTML::Template->new() : can't mkdir $cache_dir (file_cache => 1): $!");
     }
 
     $options->{cache_debug}
-      and print STDERR
-      "### HTML::Template Cache Debug ### FILE CACHE LOAD : $options->{filepath}\n";
+      and print STDERR "### HTML::Template Cache Debug ### FILE CACHE LOAD : $options->{filepath}\n";
 
     my $result;
     eval {
-        $result = Storable::lock_store(
-            [$self->{mtime}, $self->{included_mtimes}, $self->{param_map}, $self->{parse_stack}],
+        $result = Storable::lock_store([$self->{mtime}, $self->{included_mtimes}, $self->{param_map}, $self->{parse_stack}],
             scalar File::Spec->join($cache_dir, $cache_file));
     };
-    croak(
-        "HTML::Template::new() - Problem writing cache file $cache_dir/$cache_file (file_cache => 1) : $@"
-    ) if $@;
-    croak(
-        "HTML::Template::new() - Problem writing cache file $cache_dir/$cache_file (file_cache => 1) : $!"
-    ) unless defined $result;
+    croak("HTML::Template::new() - Problem writing cache file $cache_dir/$cache_file (file_cache => 1) : $@") if $@;
+    croak("HTML::Template::new() - Problem writing cache file $cache_dir/$cache_file (file_cache => 1) : $!")
+      unless defined $result;
 }
 
 # Shared cache routines.
@@ -1551,8 +1525,7 @@ sub _fetch_from_shared_cache {
     # fetch from the shared cache.
     $self->{record} = $self->{cache}{$filepath};
 
-    ($self->{mtime}, $self->{included_mtimes}, $self->{param_map}, $self->{parse_stack}) =
-      @{$self->{record}}
+    ($self->{mtime}, $self->{included_mtimes}, $self->{param_map}, $self->{parse_stack}) = @{$self->{record}}
       if defined($self->{record});
 
     $options->{cache_debug}
@@ -1584,8 +1557,7 @@ sub _validate_shared_cache {
         and $mtime != $c_mtime)
     {
         $options->{cache_debug}
-          and print STDERR
-          "### HTML::Template Cache Debug ### SHARED CACHE MISS : $filename : $mtime\n";
+          and print STDERR "### HTML::Template Cache Debug ### SHARED CACHE MISS : $filename : $mtime\n";
         return 0;
     }
 
@@ -1596,8 +1568,7 @@ sub _validate_shared_cache {
             next unless defined($included_mtimes->{$fname});
             if ($included_mtimes->{$fname} != (stat($fname))[9]) {
                 $options->{cache_debug}
-                  and print STDERR
-                  "### HTML::Template Cache Debug ### SHARED CACHE MISS : $filename : INCLUDE $fname\n";
+                  and print STDERR "### HTML::Template Cache Debug ### SHARED CACHE MISS : $filename : INCLUDE $fname\n";
                 return 0;
             }
         }
@@ -1616,11 +1587,9 @@ sub _load_shared_cache {
     $self->_parse();
 
     $options->{cache_debug}
-      and print STDERR
-      "### HTML::Template Cache Debug ### SHARED CACHE LOAD : $options->{filepath}\n";
+      and print STDERR "### HTML::Template Cache Debug ### SHARED CACHE LOAD : $options->{filepath}\n";
 
-    print STDERR "### HTML::Template Memory Debug ### END CACHE LOAD ", $self->{proc_mem}->size(),
-      "\n"
+    print STDERR "### HTML::Template Memory Debug ### END CACHE LOAD ", $self->{proc_mem}->size(), "\n"
       if $options->{memory_debug};
 
     return [$self->{mtime}, $self->{included_mtimes}, $self->{param_map}, $self->{parse_stack}];
@@ -1715,16 +1684,15 @@ sub _init_template {
     my $self    = shift;
     my $options = $self->{options};
 
-    print STDERR "### HTML::Template Memory Debug ### START INIT_TEMPLATE ",
-      $self->{proc_mem}->size(), "\n"
+    print STDERR "### HTML::Template Memory Debug ### START INIT_TEMPLATE ", $self->{proc_mem}->size(), "\n"
       if $options->{memory_debug};
 
     if (exists($options->{filename})) {
         my $filepath = $options->{filepath};
         if (not defined $filepath) {
             $filepath = $self->_find_file($options->{filename});
-            confess("HTML::Template->new() : Cannot open included file $options->{filename} : file not found.") 
-                unless defined($filepath);
+            confess("HTML::Template->new() : Cannot open included file $options->{filename} : file not found.")
+              unless defined($filepath);
             # we'll need this for future reference - to call stat() for example.
             $options->{filepath} = $filepath;
         }
@@ -1762,13 +1730,10 @@ sub _init_template {
 
         delete($options->{filehandle});
     } else {
-        confess(
-            "HTML::Template : Need to call new with filename, filehandle, scalarref or arrayref parameter specified."
-        );
+        confess("HTML::Template : Need to call new with filename, filehandle, scalarref or arrayref parameter specified.");
     }
 
-    print STDERR "### HTML::Template Memory Debug ### END INIT_TEMPLATE ",
-      $self->{proc_mem}->size(), "\n"
+    print STDERR "### HTML::Template Memory Debug ### END INIT_TEMPLATE ", $self->{proc_mem}->size(), "\n"
       if $options->{memory_debug};
 
     # handle filters if necessary
@@ -1785,9 +1750,8 @@ sub _call_filters {
 
     my ($format, $sub);
     foreach my $filter (@{$options->{filter}}) {
-        croak(
-            "HTML::Template->new() : bad value set for filter parameter - must be a code ref or a hash ref."
-        ) unless ref $filter;
+        croak("HTML::Template->new() : bad value set for filter parameter - must be a code ref or a hash ref.")
+          unless ref $filter;
 
         # translate into CODE->HASH
         $filter = {'format' => 'scalar', 'sub' => $filter}
@@ -1799,16 +1763,13 @@ sub _call_filters {
 
             # check types and values
             croak(
-                "HTML::Template->new() : bad value set for filter parameter - hash must contain \"format\" key and \"sub\" key."
-            ) unless defined $format and defined $sub;
-            croak(
-                "HTML::Template->new() : bad value set for filter parameter - \"format\" must be either 'array' or 'scalar'"
-              )
+                "HTML::Template->new() : bad value set for filter parameter - hash must contain \"format\" key and \"sub\" key.")
+              unless defined $format and defined $sub;
+            croak("HTML::Template->new() : bad value set for filter parameter - \"format\" must be either 'array' or 'scalar'")
               unless $format eq 'array'
                   or $format eq 'scalar';
-            croak(
-                "HTML::Template->new() : bad value set for filter parameter - \"sub\" must be a code ref"
-            ) unless ref $sub and ref $sub eq 'CODE';
+            croak("HTML::Template->new() : bad value set for filter parameter - \"sub\" must be a code ref")
+              unless ref $sub and ref $sub eq 'CODE';
 
             # catch errors
             eval {
@@ -1827,9 +1788,7 @@ sub _call_filters {
             };
             croak("HTML::Template->new() : fatal error occured during filter call: $@") if $@;
         } else {
-            croak(
-                "HTML::Template->new() : bad value set for filter parameter - must be code ref or hash ref"
-            );
+            croak("HTML::Template->new() : bad value set for filter parameter - must be code ref or hash ref");
         }
     }
     # all done
@@ -1894,13 +1853,7 @@ sub _parse {
     use vars qw($fcounter $fname $fmax);
     local (*fcounter, *fname, *fmax);
 
-    my @fstack = (
-        [
-            $options->{filepath} || "/fake/path/for/non/file/template",
-            1,
-            scalar @{[$self->{template} =~ m/(\n)/g]} + 1
-        ]
-    );
+    my @fstack = ([$options->{filepath} || "/fake/path/for/non/file/template", 1, scalar @{[$self->{template} =~ m/(\n)/g]} + 1]);
     (*fname, *fcounter, *fmax) = \(@{$fstack[0]});
 
     my $NOOP      = HTML::Template::NOOP->new();
@@ -2075,11 +2028,10 @@ sub _parse {
             $which = uc($1);    # which tag is it
 
             $escape =
-                defined $5  ? $5 
+                defined $5  ? $5
               : defined $15 ? $15
-              : (defined $options->{default_escape} && $which eq 'TMPL_VAR')
-              ? $options->{default_escape}
-              : 0;              # escape set?
+              : (defined $options->{default_escape} && $which eq 'TMPL_VAR') ? $options->{default_escape}
+              :                                                                0;                           # escape set?
 
             # what name for the tag?  undef for a /tag at most, one of the
             # following three will be defined
@@ -2087,8 +2039,8 @@ sub _parse {
 
             # is there a default?
             $default =
-                defined $2  ? $2 
-              : defined $3  ? $3 
+                defined $2  ? $2
+              : defined $3  ? $3
               : defined $4  ? $4
               : defined $6  ? $6
               : defined $7  ? $7
@@ -2112,20 +2064,17 @@ sub _parse {
               if ($need_names{$which} and (not defined $name or not length $name));
 
             # die if we got an escape but can't use one
-            die
-              "HTML::Template->new() : ESCAPE option invalid in a $which tag at $fname : line $fcounter."
+            die "HTML::Template->new() : ESCAPE option invalid in a $which tag at $fname : line $fcounter."
               if ($escape and ($which ne 'TMPL_VAR'));
 
             # die if we got a default but can't use one
-            die
-              "HTML::Template->new() : DEFAULT option invalid in a $which tag at $fname : line $fcounter."
+            die "HTML::Template->new() : DEFAULT option invalid in a $which tag at $fname : line $fcounter."
               if (defined $default and ($which ne 'TMPL_VAR'));
 
             # take actions depending on which tag found
             if ($which eq 'TMPL_VAR') {
                 $options->{debug}
-                  and print STDERR
-                  "### HTML::Template Debug ### $fname : line $fcounter : parsed VAR $name\n";
+                  and print STDERR "### HTML::Template Debug ### $fname : line $fcounter : parsed VAR $name\n";
 
                 # if we already have this var, then simply link to the existing
                 # HTML::Template::VAR, else create a new one.
@@ -2170,8 +2119,7 @@ sub _parse {
             } elsif ($which eq 'TMPL_LOOP') {
                 # we've got a loop start
                 $options->{debug}
-                  and print STDERR
-                  "### HTML::Template Debug ### $fname : line $fcounter : LOOP $name start\n";
+                  and print STDERR "### HTML::Template Debug ### $fname : line $fcounter : LOOP $name start\n";
 
                 # if we already have this loop, then simply link to the existing
                 # HTML::Template::LOOP, else create a new one.
@@ -2218,12 +2166,10 @@ sub _parse {
 
             } elsif ($which eq '/TMPL_LOOP') {
                 $options->{debug}
-                  and print STDERR
-                  "### HTML::Template Debug ### $fname : line $fcounter : LOOP end\n";
+                  and print STDERR "### HTML::Template Debug ### $fname : line $fcounter : LOOP end\n";
 
                 my $loopdata = pop(@loopstack);
-                die
-                  "HTML::Template->new() : found </TMPL_LOOP> with no matching <TMPL_LOOP> at $fname : line $fcounter!"
+                die "HTML::Template->new() : found </TMPL_LOOP> with no matching <TMPL_LOOP> at $fname : line $fcounter!"
                   unless defined $loopdata;
 
                 my ($loop, $starts_at) = @$loopdata;
@@ -2240,11 +2186,9 @@ sub _parse {
                         $uc->[HTML::Template::COND::VARIABLE] = $pmap{$var};
                     }
                     if (ref($pmap{$var}) eq 'HTML::Template::VAR') {
-                        $uc->[HTML::Template::COND::VARIABLE_TYPE] =
-                          HTML::Template::COND::VARIABLE_TYPE_VAR;
+                        $uc->[HTML::Template::COND::VARIABLE_TYPE] = HTML::Template::COND::VARIABLE_TYPE_VAR;
                     } else {
-                        $uc->[HTML::Template::COND::VARIABLE_TYPE] =
-                          HTML::Template::COND::VARIABLE_TYPE_LOOP;
+                        $uc->[HTML::Template::COND::VARIABLE_TYPE] = HTML::Template::COND::VARIABLE_TYPE_LOOP;
                     }
                 }
 
@@ -2267,23 +2211,20 @@ sub _parse {
                 # param_map.  This means that only the enclosing template
                 # does _parse() - sub-templates get their parse_stack and
                 # param_map fed to them already filled in.
-                $loop->[HTML::Template::LOOP::TEMPLATE_HASH]{$starts_at} =
-                  ref($self)->_new_from_loop(
-                    parse_stack       => $parse_stack,
-                    param_map         => $param_map,
-                    debug             => $options->{debug},
-                    die_on_bad_params => $options->{die_on_bad_params},
-                    loop_context_vars => $options->{loop_context_vars},
-                    case_sensitive    => $options->{case_sensitive},
-                    force_untaint     => $options->{force_untaint},
-                    parent_global_vars =>
-                      ($options->{global_vars} || $options->{parent_global_vars} || 0)
-                  );
+                $loop->[HTML::Template::LOOP::TEMPLATE_HASH]{$starts_at} = ref($self)->_new_from_loop(
+                    parse_stack        => $parse_stack,
+                    param_map          => $param_map,
+                    debug              => $options->{debug},
+                    die_on_bad_params  => $options->{die_on_bad_params},
+                    loop_context_vars  => $options->{loop_context_vars},
+                    case_sensitive     => $options->{case_sensitive},
+                    force_untaint      => $options->{force_untaint},
+                    parent_global_vars => ($options->{global_vars} || $options->{parent_global_vars} || 0)
+                );
 
             } elsif ($which eq 'TMPL_IF' or $which eq 'TMPL_UNLESS') {
                 $options->{debug}
-                  and print STDERR
-                  "### HTML::Template Debug ### $fname : line $fcounter : $which $name start\n";
+                  and print STDERR "### HTML::Template Debug ### $fname : line $fcounter : $which $name start\n";
 
                 # if we already have this var, then simply link to the existing
                 # HTML::Template::VAR/LOOP, else defer the mapping
@@ -2300,7 +2241,7 @@ sub _parse {
                     $cond->[HTML::Template::COND::WHICH]        = HTML::Template::COND::WHICH_IF;
                     $cond->[HTML::Template::COND::JUMP_IF_TRUE] = 0;
                 } else {
-                    $cond->[HTML::Template::COND::WHICH] = HTML::Template::COND::WHICH_UNLESS;
+                    $cond->[HTML::Template::COND::WHICH]        = HTML::Template::COND::WHICH_UNLESS;
                     $cond->[HTML::Template::COND::JUMP_IF_TRUE] = 1;
                 }
 
@@ -2310,11 +2251,9 @@ sub _parse {
                     push(@ucstack, $cond);
                 } else {
                     if (ref($var) eq 'HTML::Template::VAR') {
-                        $cond->[HTML::Template::COND::VARIABLE_TYPE] =
-                          HTML::Template::COND::VARIABLE_TYPE_VAR;
+                        $cond->[HTML::Template::COND::VARIABLE_TYPE] = HTML::Template::COND::VARIABLE_TYPE_VAR;
                     } else {
-                        $cond->[HTML::Template::COND::VARIABLE_TYPE] =
-                          HTML::Template::COND::VARIABLE_TYPE_LOOP;
+                        $cond->[HTML::Template::COND::VARIABLE_TYPE] = HTML::Template::COND::VARIABLE_TYPE_LOOP;
                     }
                 }
 
@@ -2324,18 +2263,15 @@ sub _parse {
 
             } elsif ($which eq '/TMPL_IF' or $which eq '/TMPL_UNLESS') {
                 $options->{debug}
-                  and print STDERR
-                  "### HTML::Template Debug ### $fname : line $fcounter : $which end\n";
+                  and print STDERR "### HTML::Template Debug ### $fname : line $fcounter : $which end\n";
 
                 my $cond = pop(@ifstack);
-                die
-                  "HTML::Template->new() : found </${which}> with no matching <TMPL_IF> at $fname : line $fcounter."
+                die "HTML::Template->new() : found </${which}> with no matching <TMPL_IF> at $fname : line $fcounter."
                   unless defined $cond;
                 if ($which eq '/TMPL_IF') {
                     die
                       "HTML::Template->new() : found </TMPL_IF> incorrectly terminating a <TMPL_UNLESS> (use </TMPL_UNLESS>) at $fname : line $fcounter.\n"
-                      if (
-                        $cond->[HTML::Template::COND::WHICH] == HTML::Template::COND::WHICH_UNLESS);
+                      if ($cond->[HTML::Template::COND::WHICH] == HTML::Template::COND::WHICH_UNLESS);
                 } else {
                     die
                       "HTML::Template->new() : found </TMPL_UNLESS> incorrectly terminating a <TMPL_IF> (use </TMPL_IF>) at $fname : line $fcounter.\n"
@@ -2361,14 +2297,13 @@ sub _parse {
                   if $cond->[HTML::Template::COND::IS_ELSE];
 
                 my $else = HTML::Template::COND->new($cond->[HTML::Template::COND::VARIABLE]);
-                $else->[HTML::Template::COND::WHICH] = $cond->[HTML::Template::COND::WHICH];
+                $else->[HTML::Template::COND::WHICH]              = $cond->[HTML::Template::COND::WHICH];
                 $else->[HTML::Template::COND::UNCONDITIONAL_JUMP] = 1;
                 $else->[HTML::Template::COND::IS_ELSE]            = 1;
 
                 # need end-block resolution?
                 if (defined($cond->[HTML::Template::COND::VARIABLE_TYPE])) {
-                    $else->[HTML::Template::COND::VARIABLE_TYPE] =
-                      $cond->[HTML::Template::COND::VARIABLE_TYPE];
+                    $else->[HTML::Template::COND::VARIABLE_TYPE] = $cond->[HTML::Template::COND::VARIABLE_TYPE];
                 } else {
                     push(@ucstack, $else);
                 }
@@ -2386,14 +2321,11 @@ sub _parse {
             } elsif ($which eq 'TMPL_INCLUDE') {
                 # handle TMPL_INCLUDEs
                 $options->{debug}
-                  and print STDERR
-                  "### HTML::Template Debug ### $fname : line $fcounter : INCLUDE $name \n";
+                  and print STDERR "### HTML::Template Debug ### $fname : line $fcounter : INCLUDE $name \n";
 
                 # no includes here, bub
                 $options->{no_includes}
-                  and croak(
-                    "HTML::Template : Illegal attempt to use TMPL_INCLUDE in template file : (no_includes => 1)"
-                  );
+                  and croak("HTML::Template : Illegal attempt to use TMPL_INCLUDE in template file : (no_includes => 1)");
 
                 my $filename = $name;
 
@@ -2402,8 +2334,7 @@ sub _parse {
                 if ($options->{search_path_on_include}) {
                     $filepath = $self->_find_file($filename);
                 } else {
-                    $filepath =
-                      $self->_find_file($filename, [File::Spec->splitdir($fstack[-1][0])]);
+                    $filepath = $self->_find_file($filename, [File::Spec->splitdir($fstack[-1][0])]);
                 }
                 die "HTML::Template->new() : Cannot open included file $filename : file not found."
                   unless defined($filepath);
@@ -2426,8 +2357,8 @@ sub _parse {
                 $self->_call_filters(\$included_template) if @{$options->{filter}};
 
                 if ($included_template) {    # not empty
-                        # handle the old vanguard format - this needs to happen here
-                        # since we're not about to do a next CHUNKS.
+                                             # handle the old vanguard format - this needs to happen here
+                                             # since we're not about to do a next CHUNKS.
                     $options->{vanguard_compatibility_mode}
                       and $included_template =~ s/%([-\w\/\.+]+)%/<TMPL_VAR NAME=$1>/g;
 
@@ -2465,8 +2396,7 @@ sub _parse {
                 }
             } else {
                 # zuh!?
-                die
-                  "HTML::Template->new() : Unknown or unmatched TMPL construct at $fname : line $fcounter.";
+                die "HTML::Template->new() : Unknown or unmatched TMPL construct at $fname : line $fcounter.";
             }
             # push the rest after the tag
             if (defined($post)) {
@@ -2503,8 +2433,7 @@ sub _parse {
 
     # make sure we don't have dangling IF or LOOP blocks
     scalar(@ifstack)
-      and die
-      "HTML::Template->new() : At least one <TMPL_IF> or <TMPL_UNLESS> not terminated at end of file!";
+      and die "HTML::Template->new() : At least one <TMPL_IF> or <TMPL_UNLESS> not terminated at end of file!";
     scalar(@loopstack)
       and die "HTML::Template->new() : At least one <TMPL_LOOP> not terminated at end of file!";
 
@@ -2529,8 +2458,7 @@ sub _parse {
     # want a stack dump?
     if ($options->{stack_debug}) {
         require 'Data/Dumper.pm';
-        print STDERR "### HTML::Template _param Stack Dump ###\n\n",
-          Data::Dumper::Dumper($self->{parse_stack}), "\n";
+        print STDERR "### HTML::Template _param Stack Dump ###\n\n", Data::Dumper::Dumper($self->{parse_stack}), "\n";
     }
 
     # get rid of filters - they cause runtime errors if Storable tries
@@ -2681,9 +2609,7 @@ sub param {
     }
 
     if (!scalar(@_)) {
-        croak(
-            "HTML::Template->param() : Single reference arg to param() must be a hash-ref!  You gave me a $type."
-          )
+        croak("HTML::Template->param() : Single reference arg to param() must be a hash-ref!  You gave me a $type.")
           unless $type eq 'HASH'
               or UNIVERSAL::isa($first, 'HASH');
         push(@_, %$first);
@@ -2734,14 +2660,12 @@ sub param {
         {
             (ref($param_map->{$param}) eq 'HTML::Template::LOOP')
               or croak(
-                "HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!"
-              );
+                "HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!");
             $param_map->{$param}[HTML::Template::LOOP::PARAM_SET] = [@{$value}];
         } else {
             (ref($param_map->{$param}) eq 'HTML::Template::VAR')
-              or croak(
-                "HTML::Template::param() : attempt to set parameter '$param' with a scalar - parameter is not a TMPL_VAR!"
-              );
+              or
+              croak("HTML::Template::param() : attempt to set parameter '$param' with a scalar - parameter is not a TMPL_VAR!");
             ${$param_map->{$param}} = $value;
         }
     }
@@ -2814,8 +2738,7 @@ sub output {
       unless ((@_ % 2) == 0);
     my %args = @_;
 
-    print STDERR "### HTML::Template Memory Debug ### START OUTPUT ", $self->{proc_mem}->size(),
-      "\n"
+    print STDERR "### HTML::Template Memory Debug ### START OUTPUT ", $self->{proc_mem}->size(), "\n"
       if $options->{memory_debug};
 
     $options->{debug} and print STDERR "### HTML::Template Debug ### In output\n";
@@ -2823,8 +2746,7 @@ sub output {
     # want a stack dump?
     if ($options->{stack_debug}) {
         require 'Data/Dumper.pm';
-        print STDERR "### HTML::Template output Stack Dump ###\n\n",
-          Data::Dumper::Dumper($self->{parse_stack}), "\n";
+        print STDERR "### HTML::Template output Stack Dump ###\n\n", Data::Dumper::Dumper($self->{parse_stack}), "\n";
     }
 
     # globalize vars - this happens here to localize the circular
@@ -2850,9 +2772,7 @@ sub output {
         foreach my $param (keys %{$self->{param_map}}) {
             unless (defined($self->param($param))) {
               OBJ: foreach my $associated_object (reverse @{$options->{associate}}) {
-                    $self->param($param,
-                        scalar $associated_object->param($case_map{$associated_object}{$param})),
-                      last OBJ
+                    $self->param($param, scalar $associated_object->param($case_map{$associated_object}{$param})), last OBJ
                       if (exists($case_map{$associated_object}{$param}));
                 }
             }
@@ -2881,9 +2801,7 @@ sub output {
             if (defined($$line)) {
                 if ($options->{force_untaint}) {
                     my $tmp = $$line->($self);
-                    croak(
-                        "HTML::Template->output() : 'force_untaint' option but coderef returns tainted value"
-                    ) if tainted($tmp);
+                    croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value") if tainted($tmp);
                     $result .= $tmp;
                 } else {
                     $result .= $$line->($self);
@@ -2908,9 +2826,7 @@ sub output {
                 $x = $line->[HTML::Template::COND::JUMP_ADDRESS];
             } else {
                 if ($line->[HTML::Template::COND::JUMP_IF_TRUE]) {
-                    if ($line->[HTML::Template::COND::VARIABLE_TYPE] ==
-                        HTML::Template::COND::VARIABLE_TYPE_VAR)
-                    {
+                    if ($line->[HTML::Template::COND::VARIABLE_TYPE] == HTML::Template::COND::VARIABLE_TYPE_VAR) {
                         if (defined ${$line->[HTML::Template::COND::VARIABLE]}) {
                             if (ref(${$line->[HTML::Template::COND::VARIABLE]}) eq 'CODE') {
                                 $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
@@ -2922,19 +2838,11 @@ sub output {
                         }
                     } else {
                         $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
-                          if (
-                            defined $line->[HTML::Template::COND::VARIABLE]
-                            [HTML::Template::LOOP::PARAM_SET]
-                            and scalar @{
-                                $line->[HTML::Template::COND::VARIABLE]
-                                  [HTML::Template::LOOP::PARAM_SET]
-                            }
-                          );
+                          if (defined $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET]
+                            and scalar @{$line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET]});
                     }
                 } else {
-                    if ($line->[HTML::Template::COND::VARIABLE_TYPE] ==
-                        HTML::Template::COND::VARIABLE_TYPE_VAR)
-                    {
+                    if ($line->[HTML::Template::COND::VARIABLE_TYPE] == HTML::Template::COND::VARIABLE_TYPE_VAR) {
                         if (defined ${$line->[HTML::Template::COND::VARIABLE]}) {
                             if (ref(${$line->[HTML::Template::COND::VARIABLE]}) eq 'CODE') {
                                 $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
@@ -2948,14 +2856,8 @@ sub output {
                         }
                     } else {
                         $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
-                          if (
-                            not defined $line->[HTML::Template::COND::VARIABLE]
-                            [HTML::Template::LOOP::PARAM_SET]
-                            or not scalar @{
-                                $line->[HTML::Template::COND::VARIABLE]
-                                  [HTML::Template::LOOP::PARAM_SET]
-                            }
-                          );
+                          if ( not defined $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET]
+                            or not scalar @{$line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET]});
                     }
                 }
             }
@@ -2984,15 +2886,12 @@ sub output {
                 if (ref($$line) eq 'CODE') {
                     $_ = $$line->($self);
                     if ($options->{force_untaint} > 1 && tainted($_)) {
-                        croak(
-                            "HTML::Template->output() : 'force_untaint' option but coderef returns tainted value"
-                        );
+                        croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
                 } else {
                     $_ = $$line;
                     if ($options->{force_untaint} > 1 && tainted($_)) {
-                        croak(
-                            "HTML::Template->output() : tainted value with 'force_untaint' option");
+                        croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
 
@@ -3013,15 +2912,12 @@ sub output {
                 if (ref($$line) eq 'CODE') {
                     $_ = $$line->($self);
                     if ($options->{force_untaint} > 1 && tainted($_)) {
-                        croak(
-                            "HTML::Template->output() : 'force_untaint' option but coderef returns tainted value"
-                        );
+                        croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
                 } else {
                     $_ = $$line;
                     if ($options->{force_untaint} > 1 && tainted($_)) {
-                        croak(
-                            "HTML::Template->output() : tainted value with 'force_untaint' option");
+                        croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
                 s/\\/\\\\/g;
@@ -3038,15 +2934,12 @@ sub output {
                 if (ref($$line) eq 'CODE') {
                     $_ = $$line->($self);
                     if ($options->{force_untaint} > 1 && tainted($_)) {
-                        croak(
-                            "HTML::Template->output() : 'force_untaint' option but coderef returns tainted value"
-                        );
+                        croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
                 } else {
                     $_ = $$line;
                     if ($options->{force_untaint} > 1 && tainted($_)) {
-                        croak(
-                            "HTML::Template->output() : tainted value with 'force_untaint' option");
+                        croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
                 # Build a char->hex map if one isn't already available
@@ -3199,8 +3092,7 @@ sub query {
             # SHAZAM!  This bit extracts all the parameter names from all the
             # loop objects for this name.
             map { $results{$_} = 1 }
-              map { keys(%{$_->{'param_map'}}) }
-              values(%{$obj->[HTML::Template::LOOP::TEMPLATE_HASH]});
+              map { keys(%{$_->{'param_map'}}) } values(%{$obj->[HTML::Template::LOOP::TEMPLATE_HASH]});
         }
         # this is our loop list, return it.
         return keys(%results);
@@ -3265,8 +3157,7 @@ sub output {
     foreach my $value_set (@$value_sets_array) {
         if ($loop_context_vars) {
             if ($count == 0) {
-                @{$value_set}{qw(__first__ __inner__ __last__)} =
-                  (1, 0, $#{$value_sets_array} == 0);
+                @{$value_set}{qw(__first__ __inner__ __last__)} = (1, 0, $#{$value_sets_array} == 0);
             } elsif ($count == $#{$value_sets_array}) {
                 @{$value_set}{qw(__first__ __inner__ __last__)} = (0, 0, 1);
             } else {

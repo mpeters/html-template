@@ -19,11 +19,7 @@ eval {
         #debug => 0,
     );
 };
-like(
-    $@,
-    qr/^You must specify the file_cache_dir option/,
-    "file_cache_dir option fails due to zero-length string"
-);
+like($@, qr/^You must specify the file_cache_dir option/, "file_cache_dir option fails due to zero-length string");
 
 eval {
     $template = HTML::Template->new(
@@ -46,9 +42,9 @@ eval {
         path           => ['templates/'],
         filename       => 'simple.tmpl',
         file_cache_dir => './blib/temp_cache_dir',
-        file_cache => undef,    # 'undef' counts as a missing value; should generate error
-                                #cache_debug => 1,
-                                #debug => 0,
+        file_cache     => undef,                     # 'undef' counts as a missing value; should generate error
+                                                     #cache_debug => 1,
+                                                     #debug => 0,
     );
 };
 like(

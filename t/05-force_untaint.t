@@ -19,11 +19,7 @@ ok(tainted($ENV{PATH}), "PATH environment variable must be set and tainted for t
 $template->param(a => $ENV{PATH});
 eval { $template->output(); };
 
-like(
-    $@,
-    qr/tainted value with 'force_untaint' option/,
-    "set tainted value despite option force_untaint"
-);
+like($@, qr/tainted value with 'force_untaint' option/, "set tainted value despite option force_untaint");
 
 sub tainter {    # coderef that returns a tainted value
     return $ENV{PATH};

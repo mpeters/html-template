@@ -30,11 +30,7 @@ ok(!defined($template->param('FOOBAR')), "undef param results in undef");
 # test for bad call to ->param with non scalar/non-hashref arg
 # dha wants to send it a puppy
 eval { my $value = $template->param(bless ['FOOBAR'], "Puppy"); };
-like(
-    $@,
-    qr/Single reference arg to param\(\) must be a hash-ref/,
-    "Single reference arg to param() must be a hash-ref!"
-);
+like($@, qr/Single reference arg to param\(\) must be a hash-ref/, "Single reference arg to param() must be a hash-ref!");
 
 # test for passing
 eval { $template->param(bless {'FOOBAR' => 42}, "Puppy") };

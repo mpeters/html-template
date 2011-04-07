@@ -32,22 +32,14 @@ $template_args_ref = {
 };
 
 ($template, $cache_load) = capture_template($capture, $template_args_ref);
-like(
-    $cache_load,
-    qr/### HTML::Template Cache Debug ### CACHE LOAD/,
-    "cache_debug CACHE LOAD message printed"
-);
+like($cache_load, qr/### HTML::Template Cache Debug ### CACHE LOAD/, "cache_debug CACHE LOAD message printed");
 $cache_keys[0] = get_cache_key($cache_load);
 
 $template->param(ADJECTIVE => sub { return 'v' . '1e' . '2r' . '3y'; });
 $output = $template->output;
 
 ($template, $cache_hit) = capture_template($capture, $template_args_ref);
-like(
-    $cache_hit,
-    qr/### HTML::Template Cache Debug ### CACHE HIT/,
-    "cache_debug CACHE HIT message printed"
-);
+like($cache_hit, qr/### HTML::Template Cache Debug ### CACHE HIT/, "cache_debug CACHE HIT message printed");
 $cache_keys[1] = get_cache_key($cache_hit);
 ok($output =~ /v1e2r3y/, "basic test of caching");
 is($cache_keys[0], $cache_keys[1], "cache keys match as expected");
@@ -65,22 +57,14 @@ $template_args_ref = {
 };
 
 ($template, $cache_load) = capture_template($capture, $template_args_ref);
-like(
-    $cache_load,
-    qr/### HTML::Template Cache Debug ### FILE CACHE HIT/,
-    "cache_debug FILE CACHE HIT message printed"
-);
+like($cache_load, qr/### HTML::Template Cache Debug ### FILE CACHE HIT/, "cache_debug FILE CACHE HIT message printed");
 $cache_keys[0] = get_cache_key($cache_load);
 
 $template->param(ADJECTIVE => sub { "3y"; });
 $output = $template->output;
 
 ($template, $cache_hit) = capture_template($capture, $template_args_ref);
-like(
-    $cache_hit,
-    qr/### HTML::Template Cache Debug ### FILE CACHE HIT/,
-    "cache_debug FILE CACHE HIT message printed"
-);
+like($cache_hit, qr/### HTML::Template Cache Debug ### FILE CACHE HIT/, "cache_debug FILE CACHE HIT message printed");
 $cache_keys[1] = get_cache_key($cache_hit);
 ok($output =~ /3y/, "output from file caching is as predicted");
 is($cache_keys[0], $cache_keys[1], "cache keys match as expected");

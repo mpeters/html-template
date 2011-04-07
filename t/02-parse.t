@@ -41,8 +41,7 @@ SKIP: {
           </TMPL_HUH>
 EOT
 
-    ok(HTML::Template->new_scalar_ref(\$tmpl_text, strict => 0),
-        "Ignores invalid TMPL tags with strict off");
+    ok(HTML::Template->new_scalar_ref(\$tmpl_text, strict => 0), "Ignores invalid TMPL tags with strict off");
 
     #test not working. Get back to it later
     eval { HTML::Template->new_scalar_ref(\$tmpl_text, strict => 0); };
