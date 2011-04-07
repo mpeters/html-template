@@ -57,10 +57,6 @@ $tmpl_text = <<EOT;
           </TMPL_LOOP>
 EOT
 
-# too chatty - could re-enable using STDERR-capturing, but it seems
-# like a lot of work for a devel-only feature
-# ok(HTML::Template->new_scalar_ref(\$tmpl_text, debug => 1), "Debug?");
-
 # attempting to check lines 1540-44
 # test using HTML_TEMPLATE_ROOT with path
 {
