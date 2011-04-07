@@ -1,8 +1,10 @@
 2.10 (in development)
-   - Moved development to GitHub
+   - Development: Moved development to GitHub
      (https://github.com/mpeters/html-template)
 
-   - Switched to using Dist::Zilla internally for release management
+   - Development: Switched to using Dist::Zilla internally for release management
+
+   - Documenation: Using more POD formatting
 
    - Test Fix: RT #26103 - t/05-blind-cache.t no longer modifies the
      distribution during the tests but instead uses temp files [Jan
