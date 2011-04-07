@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use File::Copy;
 use File::Temp;
+use File::Spec::Functions qw(curdir catfile);
 use Test::More tests => 4;
 
 use_ok('HTML::Template');
@@ -9,7 +10,7 @@ use_ok('HTML::Template');
 # use a temp file for the one that changes
 my $tmp = File::Temp->new(UNLINK => 1, SUFFIX => '.tmpl');
 
-ok(copy('templates/simple.tmpl', $tmp), "coped simple.tmpl to temp file");
+ok(copy(catfile(curdir, 'templates', 'simple.tmpl'), $tmp), "copied simple.tmpl to temp file");
 
 my ($output, $template);
 # test cache - non automated, requires turning on debug watching STDERR!
@@ -25,7 +26,7 @@ $output = $template->output;
 sleep 1;
 
 # overwrite our temp file with a different template
-ok(copy('templates/simplemod.tmpl', $tmp), "poured new content into template to test blind_cache");
+ok(copy(catfile(curdir, 'templates', 'simplemod.tmpl'), $tmp), "poured new content into template to test blind_cache");
 
 $template = HTML::Template->new(
     filename    => $tmp,
