@@ -12,6 +12,9 @@
    - Test Fix: RT #26103 - t/05-blind-cache.t no longer modifies the
      distribution during the tests but instead uses temp files [Jan
      Dubois and Michael Peters]
+
+   - Test Fix: Tests that create and modify files now use temp files
+     and file_cache_dir is always a temp directory.
  
    - Feature: RT #30586 - Added support for open_mode option to allow for
      Perl IO layers to interact when using open() on the template files

@@ -1,9 +1,12 @@
 use strict;
 use Test::More qw(no_plan);
+use File::Temp;
 
 use_ok('HTML::Template');
 
 my ($output, $template, $result);
+my $tmp_dir  = File::Temp->newdir();
+my $tmp_file = File::Temp->new();
 
 # test a simple template
 $template = HTML::Template->new(
@@ -469,7 +472,7 @@ ok(defined $@ and $@ =~ /no_includes/);
 $template = HTML::Template->new(
     path           => ['templates/'],
     filename       => 'simple.tmpl',
-    file_cache_dir => './blib/temp_cache_dir',
+    file_cache_dir => $tmp_dir,
     file_cache     => 1,
     #cache_debug => 1,
     #debug => 0,
@@ -479,7 +482,7 @@ $output   = $template->output;
 $template = HTML::Template->new(
     path           => ['templates/'],
     filename       => 'simple.tmpl',
-    file_cache_dir => './blib/temp_cache_dir',
+    file_cache_dir => $tmp_dir,
     file_cache     => 1,
     #cache_debug => 1,
     #debug => 0,
@@ -499,7 +502,7 @@ $template = HTML::Template->new(
         },
         format => 'array',
     },
-    file_cache_dir => './blib/temp_cache_dir',
+    file_cache_dir => $tmp_dir,
     file_cache     => 1,
     global_vars    => 1,
 );
@@ -511,11 +514,11 @@ $template = HTML::Template->new(filename => './templates/include_path/a.tmpl');
 $output = $template->output;
 ok($output =~ /Bar/);
 
-open(OUT, ">blib/test.out") or die $!;
+open(OUT, ">$tmp_file") or die $!;
 $template = HTML::Template->new(filename => './templates/include_path/a.tmpl');
 $template->output(print_to => *OUT);
 close(OUT);
-open(OUT, "blib/test.out") or die $!;
+open(OUT, "<$tmp_file") or die $!;
 $output = join('', <OUT>);
 close(OUT);
 ok($output =~ /Bar/);
@@ -758,7 +761,7 @@ $template = HTML::Template->new(
     path                   => ['templates', 'templates/include_path'],
     filename               => 'outer.tmpl',
     search_path_on_include => 1,
-    file_cache_dir         => './blib/temp_cache_dir',
+    file_cache_dir         => $tmp_dir,
     file_cache             => 1,
     # cache_debug => 1,
 );
@@ -770,7 +773,7 @@ $template = HTML::Template->new(
     path                   => ['templates', 'templates/include_path2'],
     filename               => 'outer.tmpl',
     search_path_on_include => 1,
-    file_cache_dir         => './blib/temp_cache_dir',
+    file_cache_dir         => $tmp_dir,
     file_cache             => 1,
     # cache_debug => 1,
 );
