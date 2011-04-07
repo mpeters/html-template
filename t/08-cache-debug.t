@@ -51,7 +51,7 @@ $template_args_ref = {
 };
 
 ($template, $cache_load) = capture_template($capture, $template_args_ref);
-like($cache_load, qr/### HTML::Template Cache Debug ### FILE CACHE HIT/, "cache_debug FILE CACHE HIT message printed");
+like($cache_load, qr/### HTML::Template Cache Debug ### FILE CACHE LOAD/, "cache_debug FILE CACHE LOAD message printed");
 $cache_keys[0] = get_cache_key($cache_load);
 
 $template->param(ADJECTIVE => sub { "3y" });
