@@ -1044,8 +1044,8 @@ sub new {
 
     # make sure taint mode is on if force_untaint flag is set
     if ($options->{force_untaint}) {
-        if( $] < 5.008001 ) {
-            croak("HTML::Template->new() : 'force_untaint' option needs at least Perl 5.8.0!");
+        if( $] < 5.008000 ) {
+            warn("HTML::Template->new() : 'force_untaint' option needs at least Perl 5.8.0!");
         } elsif(!${^TAINT}) {
             croak("HTML::Template->new() : 'force_untaint' option set but perl does not run in taint mode!");
         }
