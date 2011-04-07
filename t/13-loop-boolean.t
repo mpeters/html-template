@@ -26,7 +26,7 @@ is($output, 'You have a loop', 'non-empty structure, but empty <tmpl_loop>');
 
 =head1 NAME
 
-t/12-loop-boolean.t
+t/13-loop-boolean.t
 
 =head1 OBJECTIVE
 
