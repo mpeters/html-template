@@ -9,54 +9,54 @@ HTML::Template - Perl module to use HTML-like templating language
 =head1 SYNOPSIS
 
 First you make a template - this is just a normal HTML file with a few
-extra tags, the simplest being <TMPL_VAR>
+extra tags, the simplest being C<< <TMPL_VAR> >>
 
 For example, test.tmpl:
 
-  <html>
-  <head><title>Test Template</title>
-  <body>
-  My Home Directory is <TMPL_VAR NAME=HOME>
-  <p>
-  My Path is set to <TMPL_VAR NAME=PATH>
-  </body>
-  </html>
+    <html>
+    <head><title>Test Template</title>
+    <body>
+    My Home Directory is <TMPL_VAR NAME=HOME>
+    <p>
+    My Path is set to <TMPL_VAR NAME=PATH>
+    </body>
+    </html>
 
-Now create a small CGI program:
+Now you can use it in a small CGI program:
 
-  #!/usr/bin/perl -w
-  use HTML::Template;
+    #!/usr/bin/perl -w
+    use HTML::Template;
 
-  # open the html template
-  my $template = HTML::Template->new(filename => 'test.tmpl');
+    # open the html template
+    my $template = HTML::Template->new(filename => 'test.tmpl');
 
-  # fill in some parameters
-  $template->param(HOME => $ENV{HOME});
-  $template->param(PATH => $ENV{PATH});
+    # fill in some parameters
+    $template->param(HOME => $ENV{HOME});
+    $template->param(PATH => $ENV{PATH});
 
-  # send the obligatory Content-Type and print the template output
-  print "Content-Type: text/html\n\n", $template->output;
+    # send the obligatory Content-Type and print the template output
+    print "Content-Type: text/html\n\n", $template->output;
 
 If all is well in the universe this should show something like this in
 your browser when visiting the CGI:
 
-  My Home Directory is /home/some/directory
-  My Path is set to /bin;/usr/bin
+    My Home Directory is /home/some/directory
+    My Path is set to /bin;/usr/bin
 
 =head1 DESCRIPTION
 
 This module attempts to make using HTML templates simple and natural.
-It extends standard HTML with a few new HTML-esque tags - <TMPL_VAR>,
-<TMPL_LOOP>, <TMPL_INCLUDE>, <TMPL_IF>, <TMPL_ELSE> and <TMPL_UNLESS>.
-The file written with HTML and these new tags is called a template.
-It is usually saved separate from your script - possibly even created
-by someone else!  Using this module you fill in the values for the
-variables, loops and branches declared in the template.  This allows
-you to separate design - the HTML - from the data, which you generate
-in the Perl script.
+It extends standard HTML with a few new HTML-esque tags - C<< <TMPL_VAR> >> 
+C<< <TMPL_LOOP> >>, C<< <TMPL_INCLUDE> >>, C<< <TMPL_IF> >>, C<< <TMPL_ELSE> >> 
+and C<< <TMPL_UNLESS> >>.  The file written with HTML and these new tags
+is called a template.  It is usually saved separate from your script -
+possibly even created by someone else!  Using this module you fill in the
+values for the variables, loops and branches declared in the template.
+This allows you to separate design - the HTML - from the data, which
+you generate in the Perl script.
 
-This module is licensed under the GPL.  See the LICENSE section
-below for more details.
+This module is licensed under the same terms as Perl. See the LICENSE
+section below for more details.
 
 =head1 TUTORIAL
 
@@ -68,24 +68,23 @@ introductory article available on the HTML::Template website:
 =head1 MOTIVATION
 
 It is true that there are a number of packages out there to do HTML
-templates.  On the one hand you have things like HTML::Embperl which
-allows you freely mix Perl with HTML.  On the other hand lie
-home-grown variable substitution solutions.  Hopefully the module can
-find a place between the two.
+templates.  On the one hand you have things like L<HTML::Embperl> which
+allows you freely mix Perl with HTML.  On the other hand lie home-grown
+variable substitution solutions.  Hopefully the module can find a place
+between the two.
 
-One advantage of this module over a full HTML::Embperl-esque solution
-is that it enforces an important divide - design and programming.  By
-limiting the programmer to just using simple variables and loops in
-the HTML, the template remains accessible to designers and other
-non-perl people.  The use of HTML-esque syntax goes further to make
-the format understandable to others.  In the future this similarity
-could be used to extend existing HTML editors/analyzers to support
-HTML::Template.
+One advantage of this module over a full L<HTML::Embperl>-esque solution
+is that it enforces an important divide - design and programming.
+By limiting the programmer to just using simple variables and loops
+in the HTML, the template remains accessible to designers and other
+non-perl people.  The use of HTML-esque syntax goes further to make the
+format understandable to others.  In the future this similarity could be
+used to extend existing HTML editors/analyzers to support HTML::Template.
 
 An advantage of this module over home-grown tag-replacement schemes is
 the support for loops.  In my work I am often called on to produce
 tables of data in html.  Producing them using simplistic HTML
-templates results in CGIs containing lots of HTML since the HTML
+templates results in programs containing lots of HTML since the HTML
 itself cannot represent loops.  The introduction of loop statements in
 the HTML simplifies this situation considerably.  The designer can
 layout a single row and the programmer can fill it in as many times as
@@ -100,21 +99,23 @@ better.  And it's pretty fast.
 
 =head2 TMPL_VAR
 
-  <TMPL_VAR NAME="PARAMETER_NAME">
+    <TMPL_VAR NAME="PARAMETER_NAME">
 
-The <TMPL_VAR> tag is very simple.  For each <TMPL_VAR> tag in the
-template you call $template->param(PARAMETER_NAME => "VALUE").  When
-the template is output the <TMPL_VAR> is replaced with the VALUE text
-you specified.  If you don't set a parameter it just gets skipped in
-the output.
+The C<< <TMPL_VAR> > tag is very simple.  For each C<< <TMPL_VAR> >>
+tag in the template you call:
 
-Optionally you can use the "ESCAPE=HTML" option in the tag to indicate
+    $template->param(PARAMETER_NAME => "VALUE") 
+
+When the template is output the C<< <TMPL_VAR>  >> is replaced with the
+VALUE text you specified.  If you don't set a parameter it just gets
+skipped in the output.
+
+Optionally you can use the C<ESCAPE=HTML> option in the tag to indicate
 that you want the value to be HTML-escaped before being returned from
-output (the old ESCAPE=1 syntax is still supported).  This means that
-the ", <, >, and & characters get translated into &quot;, &lt;, &gt;
-and &amp; respectively.  This is useful when you want to use a
-TMPL_VAR in a context where those characters would cause trouble.
-Example:
+output. This means that the ", <, >, and & characters get translated
+into &quot;, &lt;, &gt; and &amp; respectively.  This is useful when
+you want to use a TMPL_VAR in a context where those characters would
+cause trouble.  Example:
 
    <input name=param type=text value="<TMPL_VAR NAME="PARAM">">
 
@@ -124,37 +125,38 @@ ESCAPE=HTML, like this:
 
    <input name=param type=text value="<TMPL_VAR ESCAPE=HTML NAME="PARAM">">
 
-You'll get what you wanted no matter what value happens to be passed in for
-param.  You can also write ESCAPE="HTML", ESCAPE='HTML' and ESCAPE='1'.
+You'll get what you wanted no matter what value happens to be passed
+in for param.  You can also write C<ESCAPE="HTML">, C<ESCAPE='HTML'>
+and C<ESCAPE='1'>.
 
-"ESCAPE=0" and "ESCAPE=NONE" turn off escaping, which is the default
+C<ESCAPE=0> and C<ESCAPE=NONE> turn off escaping, which is the default
 behavior.
 
-There is also the "ESCAPE=URL" option which may be used for VARs that
+There is also the C<"ESCAPE=URL"> option which may be used for VARs that
 populate a URL.  It will do URL escaping, like replacing ' ' with '+'
 and '/' with '%2F'.
 
-There is also the "ESCAPE=JS" option which may be used for VARs that
-need to be placed within a Javascript string. All \n, \r, ' and " characters
-are escaped.
+There is also the C<"ESCAPE=JS"> option which may be used for VARs
+that need to be placed within a Javascript string. All \n, \r, ' and "
+characters are escaped.
 
-You can assign a default value to a variable with the DEFAULT
+You can assign a default value to a variable with the C<DEFAULT>
 attribute.  For example, this will output "the devil gave me a taco"
 if the "who" variable is not set.
 
-  The <TMPL_VAR NAME=WHO DEFAULT=devil> gave me a taco.
+    The <TMPL_VAR NAME=WHO DEFAULT=devil> gave me a taco.
 
 =head2 TMPL_LOOP
 
-  <TMPL_LOOP NAME="LOOP_NAME"> ... </TMPL_LOOP>
+    <TMPL_LOOP NAME="LOOP_NAME"> ... </TMPL_LOOP>
 
-The <TMPL_LOOP> tag is a bit more complicated than <TMPL_VAR>.  The
-<TMPL_LOOP> tag allows you to delimit a section of text and give it a
-name.  Inside this named loop you place <TMPL_VAR>s.  Now you pass to
-C<param()> a list (an array ref) of parameter assignments (hash refs) for
-this loop.  The loop iterates over the list and produces output from
-the text block for each pass.  Unset parameters are skipped.  Here's
-an example:
+The C<< <TMPL_LOOP> >> tag is a bit more complicated than C<< <TMPL_VAR> >>.  
+The C<< <TMPL_LOOP> >> tag allows you to delimit a section of text and
+give it a name.  Inside this named loop you place C<< <TMPL_VAR> >>s.
+Now you pass to C<param()> a list (an array ref) of parameter assignments
+(hash refs) for this loop.  The loop iterates over the list and produces
+output from the text block for each pass.  Unset parameters are skipped.
+Here's an example:
 
  In the template:
 
@@ -163,209 +165,202 @@ an example:
       Job:  <TMPL_VAR NAME=JOB>  <p>
    </TMPL_LOOP>
 
+ In your Perl code:
 
- In the script:
-
-   $template->param(EMPLOYEE_INFO => [ 
-                                       { name => 'Sam', job => 'programmer' },
-                                       { name => 'Steve', job => 'soda jerk' },
-                                     ]
-                   );
-   print $template->output();
-
+    $template->param(
+        EMPLOYEE_INFO => [{name => 'Sam', job => 'programmer'}, {name => 'Steve', job => 'soda jerk'}]
+    );
+    print $template->output();
   
- The output in a browser:
+ The output is:
 
-   Name: Sam
-   Job: programmer
+    Name: Sam
+    Job: programmer
 
-   Name: Steve
-   Job: soda jerk
+    Name: Steve
+    Job: soda jerk
 
-As you can see above the <TMPL_LOOP> takes a list of variable
+As you can see above the C<< <TMPL_LOOP> >> takes a list of variable
 assignments and then iterates over the loop body producing output.
 
-Often you'll want to generate a <TMPL_LOOP>'s contents
-programmatically.  Here's an example of how this can be done (many
-other ways are possible!):
+Often you'll want to generate a C<< <TMPL_LOOP> >>'s contents
+programmatically.  Here's an example of how this can be done (many other
+ways are possible!):
 
-   # a couple of arrays of data to put in a loop:
-   my @words = qw(I Am Cool);
-   my @numbers = qw(1 2 3);
+    # a couple of arrays of data to put in a loop:
+    my @words     = qw(I Am Cool);
+    my @numbers   = qw(1 2 3);
+    my @loop_data = ();              # initialize an array to hold your loop
 
-   my @loop_data = ();  # initialize an array to hold your loop
+    while (@words and @numbers) {
+        my %row_data;      # get a fresh hash for the row data
 
-   while (@words and @numbers) {
-     my %row_data;  # get a fresh hash for the row data
+        # fill in this row
+        $row_data{WORD}   = shift @words;
+        $row_data{NUMBER} = shift @numbers;
 
-     # fill in this row
-     $row_data{WORD} = shift @words;
-     $row_data{NUMBER} = shift @numbers;
- 
-     # the crucial step - push a reference to this row into the loop!
-     push(@loop_data, \%row_data);
-   }
+        # the crucial step - push a reference to this row into the loop!
+        push(@loop_data, \%row_data);
+    }
 
-   # finally, assign the loop data to the loop param, again with a
-   # reference:
-   $template->param(THIS_LOOP => \@loop_data);
+    # finally, assign the loop data to the loop param, again with a reference:
+    $template->param(THIS_LOOP => \@loop_data);
 
 The above example would work with a template like:
 
-   <TMPL_LOOP NAME="THIS_LOOP">
-      Word: <TMPL_VAR NAME="WORD">     <br>
-      Number: <TMPL_VAR NAME="NUMBER"> <p>
-   </TMPL_LOOP>
+    <TMPL_LOOP NAME="THIS_LOOP">
+      Word: <TMPL_VAR NAME="WORD">     
+      Number: <TMPL_VAR NAME="NUMBER">
+ 
+    </TMPL_LOOP>
 
 It would produce output like:
 
-   Word: I
-   Number: 1
+    Word: I
+    Number: 1
 
-   Word: Am
-   Number: 2
+    Word: Am
+    Number: 2
 
-   Word: Cool
-   Number: 3
+    Word: Cool
+    Number: 3
 
-<TMPL_LOOP>s within <TMPL_LOOP>s are fine and work as you would
-expect.  If the syntax for the C<param()> call has you stumped, here's an
-example of a param call with one nested loop:
+C<< <TMPL_LOOP> >>s within C<< <TMPL_LOOP> >>s are fine and work as you
+would expect.  If the syntax for the C<param()> call has you stumped,
+here's an example of a param call with one nested loop:
 
-  $template->param(LOOP => [
-                            { name => 'Bobby',
-                              nicknames => [
-                                            { name => 'the big bad wolf' }, 
-                                            { name => 'He-Man' },
-                                           ],
-                            },
-                           ],
-                  );
+    $template->param(
+        LOOP => [
+            {
+                name      => 'Bobby',
+                nicknames => [{name => 'the big bad wolf'}, {name => 'He-Man'}],
+            },
+        ],
+    );
 
-Basically, each <TMPL_LOOP> gets an array reference.  Inside the array
-are any number of hash references.  These hashes contain the
-name=>value pairs for a single pass over the loop template.  
+Basically, each C<< <TMPL_LOOP> >> gets an array reference.  Inside the
+array are any number of hash references.  These hashes contain the
+name=>value pairs for a single pass over the loop template.
 
-Inside a <TMPL_LOOP>, the only variables that are usable are the ones
-from the <TMPL_LOOP>.  The variables in the outer blocks are not
-visible within a template loop.  For the computer-science geeks among
-you, a <TMPL_LOOP> introduces a new scope much like a perl subroutine
-call.  If you want your variables to be global you can use
-'global_vars' option to new() described below.
+Inside a C<< <TMPL_LOOP> >>, the only variables that are usable are the
+ones from the C<< <TMPL_LOOP> >>.  The variables in the outer blocks
+are not visible within a template loop.  For the computer-science geeks
+among you, a C<< <TMPL_LOOP> >> introduces a new scope much like a perl
+subroutine call.  If you want your variables to be global you can use
+C<global_vars> option to C<new()> described below.
 
 =head2 TMPL_INCLUDE
 
-  <TMPL_INCLUDE NAME="filename.tmpl">
+    <TMPL_INCLUDE NAME="filename.tmpl">
 
-This tag includes a template directly into the current template at the
-point where the tag is found.  The included template contents are used
-exactly as if its contents were physically included in the master
+This tag includes a template directly into the current template at
+the point where the tag is found.  The included template contents are
+used exactly as if its contents were physically included in the master
 template.
 
 The file specified can be an absolute path (beginning with a '/' under
 Unix, for example).  If it isn't absolute, the path to the enclosing
 file is tried first.  After that the path in the environment variable
-HTML_TEMPLATE_ROOT is tried, if it exists.  Next, the "path" option is
-consulted, first as-is and then with HTML_TEMPLATE_ROOT prepended if
-available.  As a final attempt, the filename is passed to C<open()>
-directly.  See below for more information on HTML_TEMPLATE_ROOT and
-the "path" option to C<new()>.
+C<HTML_TEMPLATE_ROOT> is tried, if it exists.  Next, the "path" option
+is consulted, first as-is and then with C<HTML_TEMPLATE_ROOT> prepended
+if available.  As a final attempt, the filename is passed to C<open()>
+directly.  See below for more information on C<HTML_TEMPLATE_ROOT>
+and the C<path> option to C<new()>.
 
 As a protection against infinitly recursive includes, an arbitary
 limit of 10 levels deep is imposed.  You can alter this limit with the
-"max_includes" option.  See the entry for the "max_includes" option
+C<max_includes> option.  See the entry for the C<max_includes> option
 below for more details.
 
 =head2 TMPL_IF
 
-  <TMPL_IF NAME="PARAMETER_NAME"> ... </TMPL_IF>
+    <TMPL_IF NAME="PARAMETER_NAME"> ... </TMPL_IF>
 
-The <TMPL_IF> tag allows you to include or not include a block of the
-template based on the value of a given parameter name.  If the
+The C<< <TMPL_IF> >> tag allows you to include or not include a block
+of the template based on the value of a given parameter name.  If the
 parameter is given a value that is true for Perl - like '1' - then the
-block is included in the output.  If it is not defined, or given a
-false value - like '0' - then it is skipped.  The parameters are
-specified the same way as with TMPL_VAR.
+block is included in the output.  If it is not defined, or given a false
+value - like '0' - then it is skipped.  The parameters are specified
+the same way as with C<< <TMPL_VAR> >>.
 
 Example Template:
 
-   <TMPL_IF NAME="BOOL">
-     Some text that only gets displayed if BOOL is true!
-   </TMPL_IF>
+    <TMPL_IF NAME="BOOL">
+      Some text that only gets displayed if BOOL is true!
+    </TMPL_IF>
 
-Now if you call $template->param(BOOL => 1) then the above block will
-be included by output. 
+Now if you call C<< $template->param(BOOL => 1) >> then the above block
+will be included by output.
 
-<TMPL_IF> </TMPL_IF> blocks can include any valid HTML::Template
-construct - VARs and LOOPs and other IF/ELSE blocks.  Note, however,
-that intersecting a <TMPL_IF> and a <TMPL_LOOP> is invalid.
+C<< <TMPL_IF> </TMPL_IF> >> blocks can include any valid HTML::Template
+construct - C<VAR>s and C<LOOP>s and other C<IF>/C<ELSE> blocks.  Note,
+however, that intersecting a C<< <TMPL_IF> >> and a C<< <TMPL_LOOP> >>
+is invalid.
 
-   Not going to work:
-   <TMPL_IF BOOL>
+    Not going to work:
+    <TMPL_IF BOOL>
       <TMPL_LOOP SOME_LOOP>
-   </TMPL_IF>
+    </TMPL_IF>
       </TMPL_LOOP>
 
-If the name of a TMPL_LOOP is used in a TMPL_IF, the IF block will
-output if the loop has at least one row.  Example:
+If the name of a C<< <TMPL_LOOP> >> is used in a C<< <TMPL_IF> >>,
+the C<IF> block will output if the loop has at least one row.  Example:
 
-  <TMPL_IF LOOP_ONE>
-    This will output if the loop is not empty.
-  </TMPL_IF>
+    <TMPL_IF LOOP_ONE>
+      This will output if the loop is not empty.
+    </TMPL_IF>
 
-  <TMPL_LOOP LOOP_ONE>
-    ....
-  </TMPL_LOOP>
+    <TMPL_LOOP LOOP_ONE>
+      ....
+    </TMPL_LOOP>
 
 WARNING: Much of the benefit of HTML::Template is in decoupling your
 Perl and HTML.  If you introduce numerous cases where you have
-TMPL_IFs and matching Perl if()s, you will create a maintenance
+C<TMPL_IF>s and matching Perl C<if>s, you will create a maintenance
 problem in keeping the two synchronized.  I suggest you adopt the
-practice of only using TMPL_IF if you can do so without requiring a
-matching if() in your Perl code.
+practice of only using C<TMPL_IF> if you can do so without requiring a
+matching C<if> in your Perl code.
 
 =head2 TMPL_ELSE
 
-  <TMPL_IF NAME="PARAMETER_NAME"> ... <TMPL_ELSE> ... </TMPL_IF>
+    <TMPL_IF NAME="PARAMETER_NAME"> ... <TMPL_ELSE> ... </TMPL_IF>
 
-You can include an alternate block in your TMPL_IF block by using
-TMPL_ELSE.  NOTE: You still end the block with </TMPL_IF>, not
-</TMPL_ELSE>!
+You can include an alternate block in your C<< <TMPL_IF> >> block by using
+C<< <TMPL_ELSE> >>.  NOTE: You still end the block with C<< </TMPL_IF> >>, 
+not C<< </TMPL_ELSE> >>!
  
    Example:
-
-   <TMPL_IF BOOL>
-     Some text that is included only if BOOL is true
-   <TMPL_ELSE>
-     Some text that is included only if BOOL is false
-   </TMPL_IF>
+    <TMPL_IF BOOL>
+      Some text that is included only if BOOL is true
+    <TMPL_ELSE>
+      Some text that is included only if BOOL is false
+    </TMPL_IF>
 
 =head2 TMPL_UNLESS
 
-  <TMPL_UNLESS NAME="PARAMETER_NAME"> ... </TMPL_UNLESS>
+    <TMPL_UNLESS NAME="PARAMETER_NAME"> ... </TMPL_UNLESS>
 
-This tag is the opposite of <TMPL_IF>.  The block is output if the
-CONTROL_PARAMETER is set false or not defined.  You can use
-<TMPL_ELSE> with <TMPL_UNLESS> just as you can with <TMPL_IF>.
+This tag is the opposite of C<< <TMPL_IF> >>.  The block is output if the
+C<PARAMETER_NAME> is set false or not defined.  You can use
+C<< <TMPL_ELSE> >> with C<< <TMPL_UNLESS> >> just as you can with C<< <TMPL_IF> >>.
 
-  Example:
+    Example:
+    <TMPL_UNLESS BOOL>
+      Some text that is output only if BOOL is FALSE.
+    <TMPL_ELSE>
+      Some text that is output only if BOOL is TRUE.
+    </TMPL_UNLESS>
 
-  <TMPL_UNLESS BOOL>
-    Some text that is output only if BOOL is FALSE.
-  <TMPL_ELSE>
-    Some text that is output only if BOOL is TRUE.
-  </TMPL_UNLESS>
+If the name of a C<< <TMPL_LOOP> >> is used in a C<< <TMPL_UNLESS> >>,
+the C<< <UNLESS> >> block output if the loop has zero rows.
 
-If the name of a TMPL_LOOP is used in a TMPL_UNLESS, the UNLESS block
-output if the loop has zero rows.
+    <TMPL_UNLESS LOOP_ONE>
+      This will output if the loop is empty.
+    </TMPL_UNLESS>
 
-  <TMPL_UNLESS LOOP_ONE>
-    This will output if the loop is empty.
-  </TMPL_UNLESS>
-  
-  <TMPL_LOOP LOOP_ONE>
-    ....
-  </TMPL_LOOP>
+    <TMPL_LOOP LOOP_ONE>
+      ....
+    </TMPL_LOOP>
 
 =cut
 
@@ -374,13 +369,13 @@ output if the loop has zero rows.
 HTML::Template's tags are meant to mimic normal HTML tags.  However,
 they are allowed to "break the rules".  Something like:
 
-   <img src="<TMPL_VAR IMAGE_SRC>">
+    <img src="<TMPL_VAR IMAGE_SRC>">
 
-is not really valid HTML, but it is a perfectly valid use and will
-work as planned.
+is not really valid HTML, but it is a perfectly valid use and will work
+as planned.
 
-The "NAME=" in the tag is optional, although for extensibility's sake I
-recommend using it.  Example - "<TMPL_LOOP LOOP_NAME>" is acceptable.
+The C<NAME=> in the tag is optional, although for extensibility's sake I
+recommend using it.  Example - C<< <TMPL_LOOP LOOP_NAME> >> is acceptable.
 
 If you're a fanatic about valid HTML and would like your templates
 to conform to valid HTML syntax, you may optionally type template tags
@@ -395,261 +390,262 @@ In order to realize a dramatic savings in bandwidth, the standard
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
-Call new() to create a new Template object:
+Call C<new()> to create a new Template object:
 
-  my $template = HTML::Template->new( filename => 'file.tmpl', 
-                                      option => 'value' 
-                                    );
+    my $template = HTML::Template->new(
+        filename => 'file.tmpl',
+        option   => 'value',
+    );
 
-You must call new() with at least one name => value pair specifying how
+You must call C<new()> with at least one C<name => value> pair specifying how
 to access the template text.  You can use C<< filename => 'file.tmpl' >> 
 to specify a filename to be opened as the template.  Alternately you can
 use:
 
-  my $t = HTML::Template->new( scalarref => $ref_to_template_text, 
-                               option => 'value' 
-                             );
+    my $t = HTML::Template->new(
+        scalarref => $ref_to_template_text,
+        option    => 'value',
+    );
 
 and
 
-  my $t = HTML::Template->new( arrayref => $ref_to_array_of_lines , 
-                               option => 'value' 
-                             );
+    my $t = HTML::Template->new(
+        arrayref => $ref_to_array_of_lines,
+        option   => 'value',
+    );
 
+These initialize the template from in-memory resources.  In almost every
+case you'll want to use the filename parameter.  If you're worried about
+all the disk access from reading a template file just use mod_perl and
+the cache option detailed below.
 
-These initialize the template from in-memory resources.  In almost
-every case you'll want to use the filename parameter.  If you're
-worried about all the disk access from reading a template file just
-use mod_perl and the cache option detailed below.
+You can also read the template from an already opened filehandle, either
+traditionally as a glob or as a L<FileHandle>:
 
-You can also read the template from an already opened filehandle,
-either traditionally as a glob or as a FileHandle:
+    my $t = HTML::Template->new(filehandle => *FH, option => 'value');
 
-  my $t = HTML::Template->new( filehandle => *FH, option => 'value');
-
-The four new() calling methods can also be accessed as below, if you
+The four C<new()> calling methods can also be accessed as below, if you
 prefer.
 
-  my $t = HTML::Template->new_file('file.tmpl', option => 'value');
+    my $t = HTML::Template->new_file('file.tmpl', option => 'value');
 
-  my $t = HTML::Template->new_scalar_ref($ref_to_template_text, 
-                                        option => 'value');
+    my $t = HTML::Template->new_scalar_ref($ref_to_template_text, option => 'value');
 
-  my $t = HTML::Template->new_array_ref($ref_to_array_of_lines, 
-                                       option => 'value');
+    my $t = HTML::Template->new_array_ref($ref_to_array_of_lines, option => 'value');
 
-  my $t = HTML::Template->new_filehandle($fh, 
-                                       option => 'value');
+    my $t = HTML::Template->new_filehandle($fh, option => 'value');
 
 And as a final option, for those that might prefer it, you can call new as:
 
-  my $t = HTML::Template->new(type => 'filename', 
-                              source => 'file.tmpl');
+    my $t = HTML::Template->new(
+        type   => 'filename',
+        source => 'file.tmpl',
+    );
 
 Which works for all three of the source types.
 
-If the environment variable HTML_TEMPLATE_ROOT is set and your
-filename doesn't begin with /, then the path will be relative to the
-value of $HTML_TEMPLATE_ROOT.  Example - if the environment variable
-HTML_TEMPLATE_ROOT is set to "/home/sam" and I call
-HTML::Template->new() with filename set to "sam.tmpl", the
-HTML::Template will try to open "/home/sam/sam.tmpl" to access the
-template file.  You can also affect the search path for files with the
-"path" option to new() - see below for more information.
+If the environment variable C<HTML_TEMPLATE_ROOT> is set and your
+filename doesn't begin with "/", then the path will be relative to the
+value of c<HTML_TEMPLATE_ROOT>.  
 
-You can modify the Template object's behavior with new().  The options
+B<Example> - if the environment variable C<HTML_TEMPLATE_ROOT> is set to
+F</home/sam> and I call C<< HTML::Template->new() >> with filename set
+to "sam.tmpl", HTML::Template will try to open F</home/sam/sam.tmpl> to
+access the template file.  You can also affect the search path for files
+with the C<path> option to C<new()> - see below for more information.
+
+You can modify the Template object's behavior with C<new()>. The options
 are available:
 
-=over 4
+=head3 Error Detection Options
 
-=item Error Detection Options
+=over
 
-=over 4 
+=item * die_on_bad_params
 
-=item *
+If set to 0 the module will let you call:
 
-die_on_bad_params - if set to 0 the module will let you call
-$template->param(param_name => 'value') even if 'param_name' doesn't
-exist in the template body.  Defaults to 1.
+    $template->param(param_name => 'value')
 
-=item *
+even if 'param_name' doesn't exist in the template body.  Defaults to 1.
 
-force_untaint - if set to 1 the module will not allow you to set 
-unescaped parameters with tainted values. If set to 2 you will have 
-to untaint all parameters, including ones with the escape attribute.
-This option makes sure you untaint everything so you don't accidentally
-introduce e.g. cross-site-scripting (CSS) vulnerabilities. Requires 
-taint mode. Defaults to 0.
+=item * force_untaint 
+
+If set to 1 the module will not allow you to set unescaped parameters
+with tainted values. If set to 2 you will have to untaint all
+parameters, including ones with the escape attribute.  This option
+makes sure you untaint everything so you don't accidentally introduce
+e.g. cross-site-scripting (XSS) vulnerabilities. Requires taint
+mode. Defaults to 0.
 
 =item *
 
 strict - if set to 0 the module will allow things that look like they
 might be TMPL_* tags to get by without dieing.  Example:
 
-   <TMPL_HUH NAME=ZUH>
+    <TMPL_HUH NAME=ZUH>
 
-Would normally cause an error, but if you call new with strict => 0,
+Would normally cause an error, but if you call new with C<< strict => 0 >> 
 HTML::Template will ignore it.  Defaults to 1.
 
-=item *
+=item * vanguard_compatibility_mode 
 
-vanguard_compatibility_mode - if set to 1 the module will expect to
-see <TMPL_VAR>s that look like %NAME% in addition to the standard
-syntax.  Also sets die_on_bad_params => 0.  If you're not at Vanguard
-Media trying to use an old format template don't worry about this one.
-Defaults to 0.
+If set to 1 the module will expect to see C<< <TMPL_VAR> >>s that
+look like C<%NAME%> in addition to the standard syntax.  Also sets
+C<die_on_bad_params => 0>.  If you're not at Vanguard Media trying to
+use an old format template don't worry about this one.  Defaults to 0.
 
 =back
 
-=item Caching Options
+=head3 Caching Options
 
-=over 4
+=over
 
-=item *
+=item * cache
 
-cache - if set to 1 the module will cache in memory the parsed
-templates based on the filename parameter, the modification date of the
-file.  This only applies to templates opened with the filename
-parameter specified, not scalarref or arrayref templates.  Caching
-also looks at the modification times of any files included using
-<TMPL_INCLUDE> tags, but again, only if the template is opened with
-filename parameter.  
+If set to 1 the module will cache in memory the parsed templates based
+on the filename parameter, the modification date of the file and the
+options passed to C<new()>. This only applies to templates opened with
+the filename parameter specified, not scalarref or arrayref templates.
+Caching also looks at the modification times of any files included using
+C<< <TMPL_INCLUDE> >> tags, but again, only if the template is opened
+with filename parameter.
 
-This is mainly of use in a persistent environment like
-Apache/mod_perl.  It has absolutely no benefit in a normal CGI
-environment since the script is unloaded from memory after every
-request.  For a cache that does work for normal CGIs see the
-'shared_cache' option below.
+This is mainly of use in a persistent environment like Apache/mod_perl.
+It has absolutely no benefit in a normal CGI environment since the script
+is unloaded from memory after every request.  For a cache that does work
+for a non-persistent environment see the C<shared_cache> option below.
 
-Note that different new() parameter settings do not cause a cache
-refresh, only a change in the modification time of the template will
-trigger a cache refresh.  For most usages this is fine.  My simplistic
-testing shows that using cache yields a 90% performance increase under
-mod_perl.  Cache defaults to 0.
+My simplistic testing shows that using cache yields a 90% performance
+increase under mod_perl.  Cache defaults to 0.
 
-=item *
+=item * shared_cache
 
-shared_cache - if set to 1 the module will store its cache in shared
-memory using the IPC::SharedCache module (available from CPAN).  The
-effect of this will be to maintain a single shared copy of each parsed
-template for all instances of HTML::Template to use.  This can be a
-significant reduction in memory usage in a multiple server
-environment.  As an example, on one of our systems we use 4MB of
-template cache and maintain 25 httpd processes - shared_cache results
-in saving almost 100MB!  Of course, some reduction in speed versus
-normal caching is to be expected.  Another difference between normal
-caching and shared_cache is that shared_cache will work in a CGI
-environment - normal caching is only useful in a persistent
-environment like Apache/mod_perl.
+If set to 1 the module will store its cache in shared memory using the
+L<IPC::SharedCache> module (available from CPAN).  The effect of this
+will be to maintain a single shared copy of each parsed template for
+all instances of HTML::Template on the same machine to use.  This can
+be a significant reduction in memory usage in an environment with a
+single machine but multiple servers.  As an example, on one of our
+systems we use 4MB of template cache and maintain 25 httpd processes -
+shared_cache results in saving almost 100MB!  Of course, some reduction
+in speed versus normal caching is to be expected.  Another difference
+between normal caching and shared_cache is that shared_cache will work
+in a non-persistent environment (like normal CGI) - normal caching is
+only useful in a persistent environment like Apache/mod_perl.
 
 By default HTML::Template uses the IPC key 'TMPL' as a shared root
 segment (0x4c504d54 in hex), but this can be changed by setting the
-'ipc_key' new() parameter to another 4-character or integer key.
+C<ipc_key> C<new()> parameter to another 4-character or integer key.
 Other options can be used to affect the shared memory cache correspond
-to IPC::SharedCache options - ipc_mode, ipc_segment_size and
-ipc_max_size.  See L<IPC::SharedCache> for a description of how these
-work - in most cases you shouldn't need to change them from the
-defaults.
+to L<IPC::SharedCache> options - C<ipc_mode>, C<ipc_segment_size> and
+C<ipc_max_size>.  See L<IPC::SharedCache> for a description of how these
+work - in most cases you shouldn't need to change them from the defaults.
 
 For more information about the shared memory cache system used by
 HTML::Template see L<IPC::SharedCache>.
 
-=item *
+=item * double_cache
 
-double_cache - if set to 1 the module will use a combination of
-shared_cache and normal cache mode for the best possible caching.  Of
-course, it also uses the most memory of all the cache modes.  All the
-same ipc_* options that work with shared_cache apply to double_cache
-as well.  By default double_cache is off.
+If set to 1 the module will use a combination of C<shared_cache> and
+normal cache mode for the best possible caching.  Of course, it also uses
+the most memory of all the cache modes.  All the same ipc_* options that
+work with C<shared_cache> apply to C<double_cache> as well. Defaults to 0.
 
-=item *
+=item * blind_cache
 
-blind_cache - if set to 1 the module behaves exactly as with normal
-caching but does not check to see if the file has changed on each
-request.  This option should be used with caution, but could be of use
-on high-load servers.  My tests show blind_cache performing only 1 to
-2 percent faster than cache under mod_perl.
+If set to 1 the module behaves exactly as with normal caching but does
+not check to see if the file has changed on each request.  This option
+should be used with caution, but could be of use on high-load servers.
+My tests show C<blind_cache> performing only 1 to 2 percent faster than
+cache under mod_perl.
 
-NOTE: Combining this option with shared_cache can result in stale
+B<NOTE>: Combining this option with shared_cache can result in stale
 templates stuck permanently in shared memory!
 
-=item *
+=item * file_cache
 
-file_cache - if set to 1 the module will store its cache in a file
-using the Storable module.  It uses no additional memory, and my
+If set to 1 the module will store its cache in a file using
+the L<Storable> module.  It uses no additional memory, and my
 simplistic testing shows that it yields a 50% performance advantage.
-Like shared_cache, it will work in a CGI environment. Default is 0.
+Like C<shared_cache>, it will work in a non-persistent environments
+(like CGI). Default is 0.
 
-If you set this option you must set the "file_cache_dir" option.  See
+If you set this option you must set the C<file_cache_dir> option. See
 below for details.
 
-NOTE: Storable using flock() to ensure safe access to cache files.
-Using file_cache on a system or filesystem (NFS) without flock()
-support is dangerous.
+B<NOTE>: L<Storable> uses C<flock()> to ensure safe access to cache
+files.  Using C<file_cache> on a system or filesystem (like NFS) without
+C<flock()> support is dangerous.
 
+=item * file_cache_dir 
 
-=item *
+Sets the directory where the module will store the cache files if
+C<file_cache> is enabled.  Your script will need write permissions to
+this directory.  You'll also need to make sure the sufficient space is
+available to store the cache files.
 
-file_cache_dir - sets the directory where the module will store the
-cache files if file_cache is enabled.  Your script will need write
-permissions to this directory.  You'll also need to make sure the
-sufficient space is available to store the cache files.
+=item * file_cache_dir_mode
 
-=item *
+Sets the file mode for newly created C<file_cache> directories and
+subdirectories.  Defaults to "0700" for security but this may be
+inconvenient if you do not have access to the account running the
+webserver.
 
-file_cache_dir_mode - sets the file mode for newly created file_cache
-directories and subdirectories.  Defaults to 0700 for security but
-this may be inconvenient if you do not have access to the account
-running the webserver.
+=item * double_file_cache
 
-=item *
-
-double_file_cache - if set to 1 the module will use a combination of
-file_cache and normal cache mode for the best possible caching.  The
-file_cache_* options that work with file_cache apply to double_file_cache
-as well.  By default double_file_cache is 0.
+If set to 1 the module will use a combination of C<file_cache> and
+normal C<cache> mode for the best possible caching.  The file_cache_*
+options that work with file_cache apply to C<double_file_cache> as well.
+Defaults to 0.
 
 =back
 
-=item Filesystem Options
+=head3 Filesystem Options
 
-=over 4
+=over
 
-=item *
+=item * path
 
-path - you can set this variable with a list of paths to search for
-files specified with the "filename" option to new() and for files
-included with the <TMPL_INCLUDE> tag.  This list is only consulted
-when the filename is relative.  The HTML_TEMPLATE_ROOT environment
-variable is always tried first if it exists.  Also, if
-HTML_TEMPLATE_ROOT is set then an attempt will be made to prepend
-HTML_TEMPLATE_ROOT onto paths in the path array.  In the case of a
-<TMPL_INCLUDE> file, the path to the including file is also tried
-before path is consulted.
+You can set this variable with a list of paths to search for files
+specified with the C<filename> option to C<new()> and for files included
+with the C<< <TMPL_INCLUDE> >> tag.  This list is only consulted when the
+filename is relative.  The C<HTML_TEMPLATE_ROOT> environment variable
+is always tried first if it exists.  Also, if C<HTML_TEMPLATE_ROOT> is
+set then an attempt will be made to prepend C<HTML_TEMPLATE_ROOT> onto
+paths in the path array.  In the case of a C<< <TMPL_INCLUDE> >> file,
+the path to the including file is also tried before path is consulted.
 
 Example:
 
-   my $template = HTML::Template->new( filename => 'file.tmpl',
-                                       path => [ '/path/to/templates',
-                                                 '/alternate/path'
-                                               ]
-                                      );
+    my $template = HTML::Template->new(
+        filename => 'file.tmpl',
+        path     => ['/path/to/templates', '/alternate/path'],
+    );
 
-NOTE: the paths in the path list must be expressed as UNIX paths,
+B<NOTE>: the paths in the path list must be expressed as UNIX paths,
 separated by the forward-slash character ('/').
 
-=item *
+=item * search_path_on_include
 
-open_mode - you can set this option to an opening mode with which all
-template files will be opened. 
+If set to a true value the module will search from the top of the array
+of paths specified by the path option on every C<< <TMPL_INCLUDE> >> and
+use the first matching template found.  The normal behavior is to look
+only in the current directory for a template to include.  Defaults to 0.
+
+=item * open_mode
+
+You can set this option to an opening mode with which all template files
+will be opened.
 
 For example, if you want to use a template that is UTF8 encoded unicode:
 
-    my $template = HTML::Template->new( filename => 'file.tmpl',
-                                        open_mode => '<:encoding(utf-8)'
-                                      );
+    my $template = HTML::Template->new(
+        filename  => 'file.tmpl',
+        open_mode => '<:encoding(utf-8)',
+    );
 
 That way you can force a charset, CR/LF properties etc. on the template
 files. See L<PerlIO> for details.
@@ -659,118 +655,112 @@ B<NOTE>: this only works in perl 5.7.1 and above.
 B<SECOND NOTE>: you have to supply an opening mode that actually permits
 reading from the file handle.
 
-=item *
+=back
 
-search_path_on_include - if set to a true value the module will search
-from the top of the array of paths specified by the path option on
-every <TMPL_INCLUDE> and use the first matching template found.  The
-normal behavior is to look only in the current directory for a
-template to include.  Defaults to 0.
+=head3 Debugging Options
+
+=over
+
+=item * debug
+
+If set to 1 the module will write random debugging information to STDERR.
+Defaults to 0.
+
+=item * stack_debug
+
+If set to 1 the module will use Data::Dumper to print out the contents
+of the parse_stack to STDERR.  Defaults to 0.
+
+=item * cache_debug
+
+If set to 1 the module will send information on cache loads, hits and
+misses to STDERR.  Defaults to 0.
+
+=item * shared_cache_debug
+
+If set to 1 the module will turn on the debug option in
+L<IPC::SharedCache>. Defaults to 0.
+
+=item * memory_debug
+
+If set to 1 the module will send information on cache memory usage
+to STDERR.  Requires the L<GTop> module.  Defaults to 0.
 
 =back
 
-=item Debugging Options
+=head3 Miscellaneous Options
 
-=over 4
+=over
 
-=item *
+=item * associate
 
-debug - if set to 1 the module will write random debugging information
-to STDERR.  Defaults to 0.
-
-=item *
-
-stack_debug - if set to 1 the module will use Data::Dumper to print
-out the contents of the parse_stack to STDERR.  Defaults to 0.
-
-=item *
-
-cache_debug - if set to 1 the module will send information on cache
-loads, hits and misses to STDERR.  Defaults to 0.
-
-=item *
-
-shared_cache_debug - if set to 1 the module will turn on the debug
-option in IPC::SharedCache - see L<IPC::SharedCache> for
-details. Defaults to 0.
-
-=item *
-
-memory_debug - if set to 1 the module will send information on cache
-memory usage to STDERR.  Requires the GTop module.  Defaults to 0.
-
-=back
-
-=item Miscellaneous Options
-
-=over 4
-
-=item *
-
-associate - this option allows you to inherit the parameter values
+This option allows you to inherit the parameter values
 from other objects.  The only requirement for the other object is that
 it have a C<param()> method that works like HTML::Template's C<param()>.  A
-good candidate would be a CGI.pm query object.  Example:
+good candidate would be a L<CGI> query object. Example:
 
-  my $query = new CGI;
-  my $template = HTML::Template->new(filename => 'template.tmpl',
-                                     associate => $query);
+    my $query    = CGI->new;
+    my $template = HTML::Template->new(
+        filename  => 'template.tmpl',
+        associate => $query,
+    );
 
 Now, C<< $template->output() >> will act as though
 
-  $template->param('FormField', $cgi->param('FormField'));
+    $template->param(form_field => $cgi->param('form_field'));
 
-had been specified for each key/value pair that would be provided by
-the C<< $cgi->param() >> method.  Parameters you set directly take
-precedence over associated parameters.
+had been specified for each key/value pair that would be provided by the
+C<< $cgi->param() >> method.  Parameters you set directly take precedence
+over associated parameters.
 
 You can specify multiple objects to associate by passing an anonymous
-array to the associate option.  They are searched for parameters in
-the order they appear:
+array to the associate option.  They are searched for parameters in the
+order they appear:
 
-  my $template = HTML::Template->new(filename => 'template.tmpl',
-                                     associate => [$query, $other_obj]);
+    my $template = HTML::Template->new(
+        filename  => 'template.tmpl',
+        associate => [$query, $other_obj],
+    );
 
-The old associateCGI() call is still supported, but should be
-considered obsolete.
-
-NOTE: The parameter names are matched in a case-insensitve manner.  If
+B<NOTE>: The parameter names are matched in a case-insensitve manner.  If
 you have two parameters in a CGI object like 'NAME' and 'Name' one
 will be chosen randomly by associate.  This behavior can be changed by
-the following option.
+the C<case_sensitive> option.
 
-=item *
+=item * case_sensitive
 
-case_sensitive - setting this option to true causes HTML::Template to
-treat template variable names case-sensitively.  The following example
-would only set one parameter without the "case_sensitive" option:
+Setting this option to true causes HTML::Template to treat template
+variable names case-sensitively.  The following example would only set
+one parameter without the C<case_sensitive> option:
 
-  my $template = HTML::Template->new(filename => 'template.tmpl',
-                                     case_sensitive => 1);
-  $template->param(
-    FieldA => 'foo',
-    fIELDa => 'bar',
-  );
+    my $template = HTML::Template->new(
+        filename       => 'template.tmpl',
+        case_sensitive => 1
+    );
+    $template->param(
+        FieldA => 'foo',
+        fIELDa => 'bar',
+    );
 
 This option defaults to off.
 
-NOTE: with case_sensitive and loop_context_vars the special loop
-variables are available in lower-case only.
+B<NOTE>: with C<case_sensitive> and C<loop_context_vars> the special
+loop variables are available in lower-case only.
 
-=item *
+=item * loop_context_vars
 
-loop_context_vars - when this parameter is set to true (it is false by
-default) four loop context variables are made available inside a loop:
-__first__, __last__, __inner__, __odd__.  They can be used with
-<TMPL_IF>, <TMPL_UNLESS> and <TMPL_ELSE> to control how a loop is
-output.  
+When this parameter is set to true (it is false by default) four loop
+context variables are made available inside a loop: C<__first__>,
+C<__last__>, C<__inner__>, C<__odd__>.  They can be used with 
+C<< <TMPL_IF> >>, C<< <TMPL_UNLESS> >> and C<< <TMPL_ELSE> >> to control
+how a loop is output.
 
-In addition to the above, a __counter__ var is also made available
+In addition to the above, a C<__counter__> var is also made available
 when loop context variables are turned on.
 
 Example:
 
-   <TMPL_LOOP NAME="FOO">
+    <TMPL_LOOP NAME="FOO">
       <TMPL_IF NAME="__first__">
         This only outputs on the first pass.
       </TMPL_IF>
@@ -792,136 +782,145 @@ Example:
       <TMPL_IF NAME="__last__">
         This only outputs on the last pass.
       </TMPL_IF>
-   </TMPL_LOOP>
+    </TMPL_LOOP>
 
 One use of this feature is to provide a "separator" similar in effect
-to the perl function join().  Example:
+to the perl function C<join()>.  Example:
 
-   <TMPL_LOOP FRUIT>
+    <TMPL_LOOP FRUIT>
       <TMPL_IF __last__> and </TMPL_IF>
       <TMPL_VAR KIND><TMPL_UNLESS __last__>, <TMPL_ELSE>.</TMPL_UNLESS>
-   </TMPL_LOOP>
+    </TMPL_LOOP>
 
-Would output (in a browser) something like:
+Would output something like:
 
   Apples, Oranges, Brains, Toes, and Kiwi.
 
-Given an appropriate C<param()> call, of course.  NOTE: A loop with only
-a single pass will get both __first__ and __last__ set to true, but
-not __inner__.
+Given an appropriate C<param()> call, of course. B<NOTE>: A loop with only
+a single pass will get both C<__first__> and C<__last__> set to true, but
+not C<__inner__>.
 
-=item *
+=item * no_includes
 
-no_includes - set this option to 1 to disallow the <TMPL_INCLUDE> tag
-in the template file.  This can be used to make opening untrusted
-templates B<slightly> less dangerous.  Defaults to 0.
+Set this option to 1 to disallow the C<< <TMPL_INCLUDE> >> tag in the
+template file.  This can be used to make opening untrusted templates
+B<slightly> less dangerous.  Defaults to 0.
 
-=item *
+=item * max_includes
 
-max_includes - set this variable to determine the maximum depth that
-includes can reach.  Set to 10 by default.  Including files to a depth
-greater than this value causes an error message to be displayed.  Set
-to 0 to disable this protection.
+Set this variable to determine the maximum depth that includes can reach.
+Set to 10 by default.  Including files to a depth greater than this
+value causes an error message to be displayed.  Set to 0 to disable
+this protection.
 
-=item *
+=item * global_vars
 
-global_vars - normally variables declared outside a loop are not
-available inside a loop.  This option makes <TMPL_VAR>s like global
-variables in Perl - they have unlimited scope.  This option also
-affects <TMPL_IF> and <TMPL_UNLESS>.
+Normally variables declared outside a loop are not available inside
+a loop.  This option makes C<< <TMPL_VAR> >>s like global variables in
+Perl - they have unlimited scope.  This option also affects C<< <TMPL_IF> >> 
+and C<< <TMPL_UNLESS> >>.
 
 Example:
 
-  This is a normal variable: <TMPL_VAR NORMAL>.<P>
+    This is a normal variable: <TMPL_VAR NORMAL>.<P>
 
-  <TMPL_LOOP NAME=FROOT_LOOP>
-     Here it is inside the loop: <TMPL_VAR NORMAL><P>
-  </TMPL_LOOP>
+    <TMPL_LOOP NAME=FROOT_LOOP>
+      Here it is inside the loop: <TMPL_VAR NORMAL><P>
+    </TMPL_LOOP>
 
-Normally this wouldn't work as expected, since <TMPL_VAR NORMAL>'s
+Normally this wouldn't work as expected, since C<< <TMPL_VAR NORMAL> >>'s 
 value outside the loop is not available inside the loop.
 
 The global_vars option also allows you to access the values of an
 enclosing loop within an inner loop.  For example, in this loop the
-inner loop will have access to the value of OUTER_VAR in the correct
+inner loop will have access to the value of C<OUTER_VAR> in the correct
 iteration:
 
-   <TMPL_LOOP OUTER_LOOP>
+    <TMPL_LOOP OUTER_LOOP>
       OUTER: <TMPL_VAR OUTER_VAR>
         <TMPL_LOOP INNER_LOOP>
            INNER: <TMPL_VAR INNER_VAR>
            INSIDE OUT: <TMPL_VAR OUTER_VAR>
         </TMPL_LOOP>
-   </TMPL_LOOP>
+    </TMPL_LOOP>
 
-One side-effect of global-vars is that variables you set with param()
-that might otherwise be ignored when die_on_bad_params is off will
-stick around.  This is necessary to allow inner loops to access values
-set for outer loops that don't directly use the value.
+One side-effect of C<global_vars> is that variables you set with
+C<param()> that might otherwise be ignored when C<die_on_bad_params>
+is off will stick around.  This is necessary to allow inner loops to
+access values set for outer loops that don't directly use the value.
 
 B<NOTE>: C<global_vars> is not C<global_loops> (which does not exist).
 That means that loops you declare at one scope are not available
 inside other loops even when C<global_vars> is on.
 
-=item *
+=item * filter
 
-filter - this option allows you to specify a filter for your template
-files.  A filter is a subroutine that will be called after
-HTML::Template reads your template file but before it starts parsing
-template tags.
+This option allows you to specify a filter for your template files.
+A filter is a subroutine that will be called after HTML::Template reads
+your template file but before it starts parsing template tags.
 
 In the most simple usage, you simply assign a code reference to the
-filter parameter.  This subroutine will recieve a single argument - a
-reference to a string containing the template file text.  Here is an
-example that accepts templates with tags that look like "!!!ZAP_VAR
-FOO!!!" and transforms them into HTML::Template tags:
+filter parameter.  This subroutine will recieve a single argument -
+a reference to a string containing the template file text.  Here is
+an example that accepts templates with tags that look like 
+C<!!!ZAP_VAR FOO!!!> and transforms them into HTML::Template tags:
 
-   my $filter = sub {
-     my $text_ref = shift;
-     $$text_ref =~ s/!!!ZAP_(.*?)!!!/<TMPL_$1>/g;
-   };
+    my $filter = sub {
+        my $text_ref = shift;
+        $$text_ref =~ s/!!!ZAP_(.*?)!!!/<TMPL_$1>/g;
+    };
 
-   # open zap.tmpl using the above filter
-   my $template = HTML::Template->new(filename => 'zap.tmpl',
-                                      filter => $filter);
+    # open zap.tmpl using the above filter
+    my $template = HTML::Template->new(
+        filename => 'zap.tmpl',
+        filter   => $filter,
+    );
 
 More complicated usages are possible.  You can request that your
-filter receieve the template text as an array of lines rather than as
-a single scalar.  To do that you need to specify your filter using a
-hash-ref.  In this form you specify the filter using the C<sub> key and
-the desired argument format using the C<format> key.  The available
-formats are C<scalar> and C<array>.  Using the C<array> format will incur
-a performance penalty but may be more convenient in some situations.
+filter receieve the template text as an array of lines rather than
+as a single scalar.  To do that you need to specify your filter using
+a hash-ref.  In this form you specify the filter using the C<sub> key
+and the desired argument format using the C<format> key.  The available
+formats are C<scalar> and C<array>.  Using the C<array> format will
+incur a performance penalty but may be more convenient in some situations.
 
-   my $template = HTML::Template->new(filename => 'zap.tmpl',
-                                      filter => { sub => $filter,
-                                                  format => 'array' });
+    my $template = HTML::Template->new(
+        filename => 'zap.tmpl',
+        filter   => {
+            sub    => $filter,
+            format => 'array',
+        }
+    );
 
 You may also have multiple filters.  This allows simple filters to be
-combined for more elaborate functionality.  To do this you specify an
-array of filters.  The filters are applied in the order they are
+combined for more elaborate functionality.  To do this you specify
+an array of filters.  The filters are applied in the order they are
 specified.
 
-   my $template = HTML::Template->new(filename => 'zap.tmpl',
-                                      filter => [ 
-                                           { sub => \&decompress,
-                                             format => 'scalar' },
-                                           { sub => \&remove_spaces,
-                                             format => 'array' }
-                                        ]);
+    my $template = HTML::Template->new(
+        filename => 'zap.tmpl',
+        filter   => [
+            {
+                sub    => \&decompress,
+                format => 'scalar',
+            },
+            {
+                sub    => \&remove_spaces,
+                format => 'array',
+            },
+        ]
+    );
 
-The specified filters will be called for any TMPL_INCLUDEed files just
+The specified filters will be called for any C<TMPL_INCLUDE>ed files just
 as they are for the main template file.
 
-=item * 
+=item * default_escape
 
-default_escape - Set this parameter to "HTML", "URL" or "JS" and
-HTML::Template will apply the specified escaping to all variables
+Set this parameter to a valid escape type (see the C<escape> option)
+and HTML::Template will apply the specified escaping to all variables
 unless they declare a different escape in the template.
 
 =back
-
-=back 4
 
 =cut
 
@@ -2495,84 +2494,60 @@ sub _unglobalize_vars {
       grep { ref($_) eq 'HTML::Template::LOOP' } @{$self->{parse_stack}};
 }
 
-=head2 param()
+=head2 param
 
 C<param()> can be called in a number of ways
 
-1) To return a list of parameters in the template : 
+=over
 
-   my @parameter_names = $self->param();
-   
+=item 1 - To return a list of parameters in the template : 
 
-2) To return the value set to a param : 
+    my @parameter_names = $self->param();
 
-   my $value = $self->param('PARAM');
+=item 2 - To return the value set to a param : 
 
-3) To set the value of a parameter :
+    my $value = $self->param('PARAM');
 
-      # For simple TMPL_VARs:
-      $self->param(PARAM => 'value');
+=item 3 - To set the value of a parameter :
 
-      # with a subroutine reference that gets called to get the value
-      # of the scalar.  The sub will recieve the template object as a
-      # parameter.
-      $self->param(PARAM => sub { return 'value' });   
+    # For simple TMPL_VARs:
+    $self->param(PARAM => 'value');
 
-      # And TMPL_LOOPs:
-      $self->param(LOOP_PARAM => 
-                   [ 
-                    { PARAM => VALUE_FOR_FIRST_PASS, ... }, 
-                    { PARAM => VALUE_FOR_SECOND_PASS, ... } 
-                    ...
-                   ]
-                  );
+    # with a subroutine reference that gets called to get the value
+    # of the scalar.  The sub will recieve the template object as a
+    # parameter.
+    $self->param(PARAM => sub { return 'value' });
 
-4) To set the value of a a number of parameters :
+    # And TMPL_LOOPs:
+    $self->param(LOOP_PARAM => [{PARAM => VALUE_FOR_FIRST_PASS}, {PARAM => VALUE_FOR_SECOND_PASS}]);
 
-     # For simple TMPL_VARs:
-     $self->param(PARAM => 'value', 
-                  PARAM2 => 'value'
-                 );
+=item 4 - To set the value of a a number of parameters :
 
-      # And with some TMPL_LOOPs:
-      $self->param(PARAM => 'value', 
-                   PARAM2 => 'value',
-                   LOOP_PARAM => 
-                   [ 
-                    { PARAM => VALUE_FOR_FIRST_PASS, ... }, 
-                    { PARAM => VALUE_FOR_SECOND_PASS, ... } 
-                    ...
-                   ],
-                   ANOTHER_LOOP_PARAM => 
-                   [ 
-                    { PARAM => VALUE_FOR_FIRST_PASS, ... }, 
-                    { PARAM => VALUE_FOR_SECOND_PASS, ... } 
-                    ...
-                   ]
-                  );
+    # For simple TMPL_VARs:
+    $self->param(
+        PARAM  => 'value',
+        PARAM2 => 'value'
+    );
 
-5) To set the value of a a number of parameters using a hash-ref :
+    # And with some TMPL_LOOPs:
+    $self->param(
+        PARAM              => 'value',
+        PARAM2             => 'value',
+        LOOP_PARAM         => [{PARAM => VALUE_FOR_FIRST_PASS}, {PARAM => VALUE_FOR_SECOND_PASS}],
+        ANOTHER_LOOP_PARAM => [{PARAM => VALUE_FOR_FIRST_PASS}, {PARAM => VALUE_FOR_SECOND_PASS}],
+    );
+=item 5 - To set the value of a a number of parameters using a hash-ref :
 
-      $self->param(
-                   { 
-                      PARAM => 'value', 
-                      PARAM2 => 'value',
-                      LOOP_PARAM => 
-                      [ 
-                        { PARAM => VALUE_FOR_FIRST_PASS, ... }, 
-                        { PARAM => VALUE_FOR_SECOND_PASS, ... } 
-                        ...
-                      ],
-                      ANOTHER_LOOP_PARAM => 
-                      [ 
-                        { PARAM => VALUE_FOR_FIRST_PASS, ... }, 
-                        { PARAM => VALUE_FOR_SECOND_PASS, ... } 
-                        ...
-                      ]
-                    }
-                   );
+    $self->param(
+        {
+            PARAM              => 'value',
+            PARAM2             => 'value',
+            LOOP_PARAM         => [{PARAM => VALUE_FOR_FIRST_PASS}, {PARAM => VALUE_FOR_SECOND_PASS}],
+            ANOTHER_LOOP_PARAM => [{PARAM => VALUE_FOR_FIRST_PASS}, {PARAM => VALUE_FOR_SECOND_PASS}],
+        }
+    );
 
-An error occurs if you try to set a value that is tainted if the "force_untaint"
+An error occurs if you try to set a value that is tainted if the C<force_untaint>
 option is set.
 
 =cut
@@ -2671,11 +2646,9 @@ sub param {
     }
 }
 
-=pod
+=head2 clear_params
 
-=head2 clear_params()
-
-Sets all the parameters to undef.  Useful internally, if nowhere else!
+Sets all the parameters to undef. Useful internally, if nowhere else!
 
 =cut
 
@@ -2701,27 +2674,27 @@ sub associateCGI {
     return 1;
 }
 
-=head2 output()
+=head2 output
 
-output() returns the final result of the template.  In most situations
+C<output()> returns the final result of the template.  In most situations
 you'll want to print this, like:
 
-   print $template->output();
+    print $template->output();
 
-When output is called each occurrence of <TMPL_VAR NAME=name> is
+When output is called each occurrence of C<< <TMPL_VAR NAME=name> >> is
 replaced with the value assigned to "name" via C<param()>.  If a named
-parameter is unset it is simply replaced with ''.  <TMPL_LOOPS> are
-evaluated once per parameter set, accumlating output on each pass.
+parameter is unset it is simply replaced with ''.  C<< <TMPL_LOOPS> >>
+are evaluated once per parameter set, accumlating output on each pass.
 
-Calling output() is guaranteed not to change the state of the
-Template object, in case you were wondering.  This property is mostly
-important for the internal implementation of loops.
+Calling C<output()> is guaranteed not to change the state of the
+HTML::Template object, in case you were wondering.  This property is
+mostly important for the internal implementation of loops.
 
-You may optionally supply a filehandle to print to automatically as
-the template is generated.  This may improve performance and lower
-memory consumption.  Example:
+You may optionally supply a filehandle to print to automatically as the
+template is generated.  This may improve performance and lower memory
+consumption.  Example:
 
-   $template->output(print_to => *STDOUT);
+    $template->output(print_to => *STDOUT);
 
 The return value is undefined when using the C<print_to> option.
 
@@ -2965,76 +2938,69 @@ sub output {
     return $result;
 }
 
-=pod
-
-=head2 query()
+=head2 query
 
 This method allow you to get information about the template structure.
 It can be called in a number of ways.  The simplest usage of query is
 simply to check whether a parameter name exists in the template, using
 the C<name> option:
 
-  if ($template->query(name => 'foo')) {
-    # do something if a varaible of any type 
-    # named FOO is in the template
-  }
+    if ($template->query(name => 'foo')) {
+        # do something if a varaible of any type named FOO is in the template
+    }
 
-This same usage returns the type of the parameter.  The type is the
-same as the tag minus the leading 'TMPL_'.  So, for example, a
-TMPL_VAR parameter returns 'VAR' from C<query()>.
+This same usage returns the type of the parameter.  The type is the same
+as the tag minus the leading 'TMPL_'.  So, for example, a C<TMPL_VAR>
+parameter returns 'VAR' from C<query()>.
 
-  if ($template->query(name => 'foo') eq 'VAR') {
-    # do something if FOO exists and is a TMPL_VAR
-  }
+    if ($template->query(name => 'foo') eq 'VAR') {
+        # do something if FOO exists and is a TMPL_VAR
+    }
 
-Note that the variables associated with TMPL_IFs and TMPL_UNLESSs will
-be identified as 'VAR' unless they are also used in a TMPL_LOOP, in
-which case they will return 'LOOP'.
+Note that the variables associated with C<TMPL_IF>s and C<TMPL_UNLESS>s
+will be identified as 'VAR' unless they are also used in a C<TMPL_LOOP>,
+in which case they will return 'LOOP'.
 
 C<query()> also allows you to get a list of parameters inside a loop
 (and inside loops inside loops).  Example loop:
 
-   <TMPL_LOOP NAME="EXAMPLE_LOOP">
-     <TMPL_VAR NAME="BEE">
-     <TMPL_VAR NAME="BOP">
-     <TMPL_LOOP NAME="EXAMPLE_INNER_LOOP">
-       <TMPL_VAR NAME="INNER_BEE">
-       <TMPL_VAR NAME="INNER_BOP">
-     </TMPL_LOOP>
-   </TMPL_LOOP>
+    <TMPL_LOOP NAME="EXAMPLE_LOOP">
+      <TMPL_VAR NAME="BEE">
+      <TMPL_VAR NAME="BOP">
+      <TMPL_LOOP NAME="EXAMPLE_INNER_LOOP">
+        <TMPL_VAR NAME="INNER_BEE">
+        <TMPL_VAR NAME="INNER_BOP">
+      </TMPL_LOOP>
+    </TMPL_LOOP>
 
 And some query calls:
   
-  # returns 'LOOP'
-  $type = $template->query(name => 'EXAMPLE_LOOP');
-    
-  # returns ('bop', 'bee', 'example_inner_loop')
-  @param_names = $template->query(loop => 'EXAMPLE_LOOP');
+    # returns 'LOOP'
+    $type = $template->query(name => 'EXAMPLE_LOOP');
 
-  # both return 'VAR'
-  $type = $template->query(name => ['EXAMPLE_LOOP', 'BEE']);
-  $type = $template->query(name => ['EXAMPLE_LOOP', 'BOP']);
+    # returns ('bop', 'bee', 'example_inner_loop')
+    @param_names = $template->query(loop => 'EXAMPLE_LOOP');
 
-  # and this one returns 'LOOP'
-  $type = $template->query(name => ['EXAMPLE_LOOP', 
-                                    'EXAMPLE_INNER_LOOP']);
-  
-  # and finally, this returns ('inner_bee', 'inner_bop')
-  @inner_param_names = $template->query(loop => ['EXAMPLE_LOOP',
-                                                 'EXAMPLE_INNER_LOOP']);
+    # both return 'VAR'
+    $type = $template->query(name => ['EXAMPLE_LOOP', 'BEE']);
+    $type = $template->query(name => ['EXAMPLE_LOOP', 'BOP']);
 
-  # for non existent parameter names you get undef
-  # this returns undef.
-  $type = $template->query(name => 'DWEAZLE_ZAPPA');
+    # and this one returns 'LOOP'
+    $type = $template->query(name => ['EXAMPLE_LOOP', 'EXAMPLE_INNER_LOOP']);
 
-  # calling loop on a non-loop parameter name will cause an error.
-  # this dies:
-  $type = $template->query(loop => 'DWEAZLE_ZAPPA');
+    # and finally, this returns ('inner_bee', 'inner_bop')
+    @inner_param_names = $template->query(loop => ['EXAMPLE_LOOP', 'EXAMPLE_INNER_LOOP']);
+
+    # for non existent parameter names you get undef this returns undef.
+    $type = $template->query(name => 'DWEAZLE_ZAPPA');
+
+    # calling loop on a non-loop parameter name will cause an error. This dies:
+    $type = $template->query(loop => 'DWEAZLE_ZAPPA');
 
 As you can see above the C<loop> option returns a list of parameter
-names and both C<name> and C<loop> take array refs in order to refer
-to parameters inside loops.  It is an error to use C<loop> with a
-parameter that is not a loop.
+names and both C<name> and C<loop> take array refs in order to refer to
+parameters inside loops.  It is an error to use C<loop> with a parameter
+that is not a loop.
 
 Note that all the names are returned in lowercase and the types are
 uppercase.
@@ -3240,192 +3206,15 @@ sub STORE {
 1;
 __END__
 
-=head1 FREQUENTLY ASKED QUESTIONS
-
-In the interest of greater understanding I've started a FAQ section of
-the perldocs.  Please look in here before you send me email.
-
-=over 4
-
-=item 1
-
-Q: Is there a place to go to discuss HTML::Template and/or get help?
-
-A: There's a mailing-list for discussing HTML::Template at
-html-template-users@lists.sourceforge.net.  To join:
-
-   http://lists.sourceforge.net/lists/listinfo/html-template-users
-
-If you just want to get email when new releases are available you can
-join the announcements mailing-list here:
-
-   http://lists.sourceforge.net/lists/listinfo/html-template-announce
-    
-=item 2
-
-Q: Is there a searchable archive for the mailing-list?
-
-A: Yes, you can find an archive of the SourceForge list here:
-
-  http://www.geocrawler.com/lists/3/SourceForge/23294/0/
-
-For an archive of the old vm.com list, setup by Sean P. Scanlon, see:
-
-   http://bluedot.net/mail/archive/
-
-=item 3
-
-Q: I want support for <TMPL_XXX>!  How about it?
-
-A: Maybe.  I definitely encourage people to discuss their ideas for
-HTML::Template on the mailing list.  Please be ready to explain to me
-how the new tag fits in with HTML::Template's mission to provide a
-fast, lightweight system for using HTML templates.
-
-NOTE: Offering to program said addition and provide it in the form of
-a patch to the most recent version of HTML::Template will definitely
-have a softening effect on potential opponents!
-
-=item 4
-
-Q: I found a bug, can you fix it?
-
-A: That depends.  Did you send me the VERSION of HTML::Template, a test
-script and a test template?  If so, then almost certainly.
-
-If you're feeling really adventurous, HTML::Template has a publically
-available Subversion server.  See below for more information in the PUBLIC
-SUBVERSION SERVER section.
-
-=item 5
-
-Q: <TMPL_VAR>s from the main template aren't working inside a
-<TMPL_LOOP>!  Why?
-
-A: This is the intended behavior.  <TMPL_LOOP> introduces a separate
-scope for <TMPL_VAR>s much like a subroutine call in Perl introduces a
-separate scope for "my" variables.
-
-If you want your <TMPL_VAR>s to be global you can set the
-'global_vars' option when you call new().  See above for documentation
-of the 'global_vars' new() option.
-
-=item 6
-
-Q: Why do you use /[Tt]/ instead of /t/i?  It's so ugly!
-
-A: Simple - the case-insensitive match switch is very inefficient.
-According to _Mastering_Regular_Expressions_ from O'Reilly Press,
-/[Tt]/ is faster and more space efficient than /t/i - by as much as
-double against long strings.  //i essentially does a lc() on the
-string and keeps a temporary copy in memory.
-
-When this changes, and it is in the 5.6 development series, I will
-gladly use //i.  Believe me, I realize [Tt] is hideously ugly.
-
-=item 7
-
-Q: How can I pre-load my templates using cache-mode and mod_perl?
-
-A: Add something like this to your startup.pl:
-
-   use HTML::Template;
-   use File::Find;
-
-   print STDERR "Pre-loading HTML Templates...\n";
-   find(
-        sub {
-          return unless /\.tmpl$/;
-          HTML::Template->new(
-                              filename => "$File::Find::dir/$_",
-                              cache => 1,
-                             );
-        },
-        '/path/to/templates',
-        '/another/path/to/templates/'
-      );
-
-Note that you'll need to modify the "return unless" line to specify
-the extension you use for your template files - I use .tmpl, as you
-can see.  You'll also need to specify the path to your template files.
-
-One potential problem: the "/path/to/templates/" must be EXACTLY the
-same path you use when you call HTML::Template->new().  Otherwise the
-cache won't know they're the same file and will load a new copy -
-instead getting a speed increase, you'll double your memory usage.  To
-find out if this is happening set cache_debug => 1 in your application
-code and look for "CACHE MISS" messages in the logs.
-
-=item 8
-
-Q: What characters are allowed in TMPL_* NAMEs?
-
-A: Numbers, letters, '.', '/', '+', '-' and '_'.
-
-=item 9
-
-Q: How can I execute a program from inside my template?  
-
-A: Short answer: you can't.  Longer answer: you shouldn't since this
-violates the fundamental concept behind HTML::Template - that design
-and code should be seperate.
-
-But, inevitably some people still want to do it.  If that describes
-you then you should take a look at
-L<HTML::Template::Expr|HTML::Template::Expr>.  Using
-HTML::Template::Expr it should be easy to write a run_program()
-function.  Then you can do awful stuff like:
-
-  <tmpl_var expr="run_program('foo.pl')">
-
-Just, please, don't tell me about it.  I'm feeling guilty enough just
-for writing HTML::Template::Expr in the first place.
-
-=item 10
-
-Q: Can I get a copy of these docs in Japanese?
-
-A: Yes you can.  See Kawai Takanori's translation at:
-
-   http://member.nifty.ne.jp/hippo2000/perltips/html/template.htm
-
-=item 11
-
-Q: What's the best way to create a <select> form element using
-HTML::Template?
-
-A: There is much disagreement on this issue.  My personal preference
-is to use CGI.pm's excellent popup_menu() and scrolling_list()
-functions to fill in a single <tmpl_var select_foo> variable.  
-
-To some people this smacks of mixing HTML and code in a way that they
-hoped HTML::Template would help them avoid.  To them I'd say that HTML
-is a violation of the principle of separating design from programming.
-There's no clear separation between the programmatic elements of the
-<form> tags and the layout of the <form> tags.  You'll have to draw
-the line somewhere - clearly the designer can't be entirely in charge
-of form creation.
-
-It's a balancing act and you have to weigh the pros and cons on each side.
-It is certainly possible to produce a <select> element entirely inside the
-template.  What you end up with is a rat's nest of loops and conditionals.
-Alternately you can give up a certain amount of flexibility in return for
-vastly simplifying your templates.  I generally choose the latter.
-
-Another option is to investigate HTML::FillInForm which some have
-reported success using to solve this problem.
-
-=back
-
 =head1 BUGS
 
 I am aware of no bugs - if you find one, join the mailing list and
 tell us about it.  You can join the HTML::Template mailing-list by
 visiting:
 
-  http://lists.sourceforge.net/lists/listinfo/html-template-users
+    http://lists.sourceforge.net/lists/listinfo/html-template-users
 
-Of course, you can still email me directly (sam@tregar.com) with bugs,
+Of course, you can still email me directly (C<sam@tregar.com>) with bugs,
 but I reserve the right to forward bug reports to the mailing list.
 
 When submitting bug reports, be sure to include full details,
@@ -3439,64 +3228,125 @@ PUBLIC SUBVERSION SERVER section.
 =head1 CREDITS
 
 This module was the brain child of my boss, Jesse Erlbaum
-( jesse@vm.com ) at Vanguard Media ( http://vm.com ) .  The most original
-idea in this module - the <TMPL_LOOP> - was entirely his.
+(C<jesse@vm.com>) at Vanguard Media (http://vm.com) .  The most original
+idea in this module - the C<< <TMPL_LOOP> >> - was entirely his.
 
 Fixes, Bug Reports, Optimizations and Ideas have been generously
 provided by:
 
-   Richard Chen
-   Mike Blazer
-   Adriano Nagelschmidt Rodrigues
-   Andrej Mikus
-   Ilya Obshadko
-   Kevin Puetz
-   Steve Reppucci
-   Richard Dice
-   Tom Hukins
-   Eric Zylberstejn
-   David Glasser
-   Peter Marelas
-   James William Carlson
-   Frank D. Cringle
-   Winfried Koenig
-   Matthew Wickline
-   Doug Steinwand
-   Drew Taylor
-   Tobias Brox
-   Michael Lloyd
-   Simran Gambhir
-   Chris Houser <chouser@bluweb.com>
-   Larry Moore
-   Todd Larason
-   Jody Biggs
-   T.J. Mather
-   Martin Schroth
-   Dave Wolfe
-   uchum
-   Kawai Takanori
-   Peter Guelich
-   Chris Nokleberg
-   Ralph Corderoy
-   William Ward
-   Ade Olonoh
-   Mark Stosberg
-   Lance Thomas
-   Roland Giersig
-   Jere Julian
-   Peter Leonard
-   Kenny Smith
-   Sean P. Scanlon
-   Martin Pfeffer
-   David Ferrance
-   Gyepi Sam  
-   Darren Chamberlain
-   Paul Baker
-   Gabor Szabo
-   Craig Manley
-   Richard Fein
-   The Phalanx Project
-   Sven Neuhaus
+=over
+
+=item * Richard Chen
+
+=item * Mike Blazer
+
+=item * Adriano Nagelschmidt Rodrigues
+
+=item * Andrej Mikus
+
+=item * Ilya Obshadko
+
+=item * Kevin Puetz
+
+=item * Steve Reppucci
+
+=item * Richard Dice
+
+=item * Tom Hukins
+
+=item * Eric Zylberstejn
+
+=item * David Glasser
+
+=item * Peter Marelas
+
+=item * James William Carlson
+
+=item * Frank D. Cringle
+
+=item * Winfried Koenig
+
+=item * Matthew Wickline
+
+=item * Doug Steinwand
+
+=item * Drew Taylor
+
+=item * Tobias Brox
+
+=item * Michael Lloyd
+
+=item * Simran Gambhir
+
+=item * Chris Houser <chouser@bluweb.com>
+
+=item * Larry Moore
+
+=item * Todd Larason
+
+=item * Jody Biggs
+
+=item * T.J. Mather
+
+=item * Martin Schroth
+
+=item * Dave Wolfe
+
+=item * uchum
+
+=item * Kawai Takanori
+
+=item * Peter Guelich
+
+=item * Chris Nokleberg
+
+=item * Ralph Corderoy
+
+=item * William Ward
+
+=item * Ade Olonoh
+
+=item * Mark Stosberg
+
+=item * Lance Thomas
+
+=item * Roland Giersig
+
+=item * Jere Julian
+
+=item * Peter Leonard
+
+=item * Kenny Smith
+
+=item * Sean P. Scanlon
+
+=item * Martin Pfeffer
+
+=item * David Ferrance
+
+=item * Gyepi Sam  
+
+=item * Darren Chamberlain
+
+=item * Paul Baker
+
+=item * Gabor Szabo
+
+=item * Craig Manley
+
+=item * Richard Fein
+
+=item * The Phalanx Project
+
+=item * Sven Neuhaus
+
+=item * Michael Peters
+
+=item * Jan Dubois
+
+=item * Moritz Lenz
+
+=back
 
 Thanks!
 
@@ -3514,15 +3364,19 @@ going to http://sourceforge.net/svn/?group_id=1075.  Give it a try!
 
 =head1 AUTHOR
 
-Sam Tregar, sam@tregar.com
+Sam Tregar, C<sam@tregar.com>
+
+=head1 CO-MAINTAINER
+
+Michael Peters, C<mpeters@plusthree.com>
 
 =head1 LICENSE
 
   HTML::Template : A module for using HTML Templates with Perl
-  Copyright (C) 2000-2002 Sam Tregar (sam@tregar.com)
+  Copyright (C) 2000-2011 Sam Tregar (sam@tregar.com)
 
   This module is free software; you can redistribute it and/or modify it
-  under the terms of either:
+  under the same terms as Perl itself, which means using either:
 
   a) the GNU General Public License as published by the Free Software
   Foundation; either version 1, or (at your option) any later version,
@@ -3537,10 +3391,10 @@ Sam Tregar, sam@tregar.com
   the GNU General Public License or the Artistic License for more details.
 
   You should have received a copy of the Artistic License with this
-  module, in the file ARTISTIC.  If not, I'll be glad to provide one.
+  module.  If not, I'll be glad to provide one.
 
   You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
+  along with this program. If not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
   USA
 
