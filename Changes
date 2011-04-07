@@ -3,7 +3,7 @@
 
    - Switched to using Dist::Zilla internally for release management
 
-   - Test Fix: RT #26103 - 05-blind-cache.t no longer modifies the
+   - Test Fix: RT #26103 - t/05-blind-cache.t no longer modifies the
      distribution during the tests but instead uses temp files.
 
 2.9 Mon Jan 29 15:54:03 EST 2007
