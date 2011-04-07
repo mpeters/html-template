@@ -25,10 +25,7 @@ $output = $template->output;
 sleep 1;
 
 # overwrite our temp file with a different template
-ok(
-    copy('templates/simplemod.tmpl', $tmp),
-    "poured new content into template to test blind_cache"
-);
+ok(copy('templates/simplemod.tmpl', $tmp), "poured new content into template to test blind_cache");
 
 $template = HTML::Template->new(
     filename    => $tmp,
