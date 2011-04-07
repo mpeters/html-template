@@ -1,10 +1,16 @@
 2.10 (in development)
-   - Moved development to GitHub (https://github.com/mpeters/html-template)
+   - Moved development to GitHub
+     (https://github.com/mpeters/html-template)
 
    - Switched to using Dist::Zilla internally for release management
 
    - Test Fix: RT #26103 - t/05-blind-cache.t no longer modifies the
-     distribution during the tests but instead uses temp files.
+     distribution during the tests but instead uses temp files [Jan
+     Dubois and Michael Peters]
+ 
+   - Feature: RT #30586 - Added support for open_mode option to allow for
+     Perl IO layers to interact when using open() on the template files
+     [moritz@faui2k3.org and Michael Peters]
 
 2.9 Mon Jan 29 15:54:03 EST 2007
    - New Feature: the new force_untaint option makes sure you do not

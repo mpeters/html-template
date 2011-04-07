@@ -267,9 +267,9 @@ Unix, for example).  If it isn't absolute, the path to the enclosing
 file is tried first.  After that the path in the environment variable
 HTML_TEMPLATE_ROOT is tried, if it exists.  Next, the "path" option is
 consulted, first as-is and then with HTML_TEMPLATE_ROOT prepended if
-available.  As a final attempt, the filename is passed to open()
+available.  As a final attempt, the filename is passed to C<open()>
 directly.  See below for more information on HTML_TEMPLATE_ROOT and
-the "path" option to new().
+the "path" option to C<new()>.
 
 As a protection against infinitly recursive includes, an arbitary
 limit of 10 levels deep is imposed.  You can alter this limit with the
@@ -510,7 +510,7 @@ Defaults to 0.
 =item *
 
 cache - if set to 1 the module will cache in memory the parsed
-templates based on the filename parameter and modification date of the
+templates based on the filename parameter, the modification date of the
 file.  This only applies to templates opened with the filename
 parameter specified, not scalarref or arrayref templates.  Caching
 also looks at the modification times of any files included using
@@ -639,6 +639,25 @@ Example:
 
 NOTE: the paths in the path list must be expressed as UNIX paths,
 separated by the forward-slash character ('/').
+
+=item *
+
+open_mode - you can set this option to an opening mode with which all
+template files will be opened. 
+
+For example:
+
+    my $template = HTML::Template->new( filename => 'file.tmpl',
+                                        open_mode => '<:encoding(utf-8)'
+                                      );
+
+That way you can force a charset, CR/LF properties etc. on the template
+files. See L<PerlIO> for details.
+
+NOTE: this only works in perl 5.7.1 and above. 
+
+SECOND NOTE: you have to supply an opening mode that actually permits
+reading from the file handle.
 
 =item *
 
@@ -980,6 +999,7 @@ sub new {
         no_includes                 => 0,
         case_sensitive              => 0,
         filter                      => [],
+        open_mode                   => '',
     );
 
     # load in options supplied to new()
@@ -1133,6 +1153,11 @@ sub new {
                 "HTML::Template->new(): Invalid setting for default_escape - '$options->{default_escape}'.  Valid values are HTML, URL or JS."
             );
         }
+    }
+
+    # no 3 args form of open before perl 5.7.1
+    if($options->{open_mode} && $] < 5.007001) {
+        croak("HTML::Template->new(): open_mode cannot be used in Perl < 5.7.1");
     }
 
     print STDERR "### HTML::Template Memory Debug ### POST CACHE INIT ", $self->{proc_mem}->size(),
@@ -1363,7 +1388,7 @@ sub _commit_to_cache {
 
 # create a cache key from a template object.  The cache key includes
 # the full path to the template and options which affect template
-# loading.  Has the side-effect of loading $self->{options}{filepath}
+# loading.
 sub _cache_key {
     my $self    = shift;
     my $options = $self->{options};
@@ -1374,6 +1399,7 @@ sub _cache_key {
     push(@key, $options->{search_path_on_include} || 0);
     push(@key, $options->{loop_context_vars} || 0);
     push(@key, $options->{global_vars} || 0);
+    push(@key, $options->{open_mode} || 0);
 
     # compute the md5 and return it
     return md5_hex(@key);
@@ -1697,15 +1723,21 @@ sub _init_template {
         my $filepath = $options->{filepath};
         if (not defined $filepath) {
             $filepath = $self->_find_file($options->{filename});
-            confess(
-                "HTML::Template->new() : Cannot open included file $options->{filename} : file not found."
-            ) unless defined($filepath);
+            confess("HTML::Template->new() : Cannot open included file $options->{filename} : file not found.") 
+                unless defined($filepath);
             # we'll need this for future reference - to call stat() for example.
             $options->{filepath} = $filepath;
         }
 
-        confess("HTML::Template->new() : Cannot open included file $options->{filename} : $!")
-          unless defined(open(TEMPLATE, $filepath));
+        # use the open_mode if we have one
+        if (my $mode = $options->{open_mode}) {
+            open(TEMPLATE, $mode, $filepath)
+              || confess("HTML::Template->new() : Cannot open included file $filepath with mode $mode: $!");
+        } else {
+            open(TEMPLATE, $filepath)
+              or confess("HTML::Template->new() : Cannot open included file $filepath : $!");
+        }
+
         $self->{mtime} = $self->_mtime($filepath);
 
         # read into scalar, note the mtime for the record
@@ -2375,8 +2407,15 @@ sub _parse {
                 }
                 die "HTML::Template->new() : Cannot open included file $filename : file not found."
                   unless defined($filepath);
-                die "HTML::Template->new() : Cannot open included file $filename : $!"
-                  unless defined(open(TEMPLATE, $filepath));
+
+                # use the open_mode if we have one
+                if (my $mode = $options->{open_mode}) {
+                    open(TEMPLATE, $mode, $filepath)
+                      || confess("HTML::Template->new() : Cannot open included file $filepath with mode $mode: $!");
+                } else {
+                    open(TEMPLATE, $filepath)
+                      or confess("HTML::Template->new() : Cannot open included file $filepath : $!");
+                }
 
                 # read into the array
                 my $included_template = "";
