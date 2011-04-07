@@ -116,11 +116,11 @@ instead getting a speed increase, you'll double your memory usage.
 To find out if this is happening set C<cache_debug => 1> in your
 application code and look for "CACHE MISS" messages in the logs.
 
-=head2 Q: What characters are allowed in TMPL_* NAMEs?
+=head2 What characters are allowed in TMPL_* names?
 
 Numbers, letters, '.', '/', '+', '-' and '_'.
 
-=head2 Q: How can I execute a program from inside my template?
+=head2 How can I execute a program from inside my template?
 
 Short answer: you can't. Longer answer: you shouldn't since this violates
 the fundamental concept behind L<HTML::Template> - that design and code
@@ -136,17 +136,17 @@ function. Then you can do awful stuff like:
 Just, please, don't tell me about it. I'm feeling guilty enough just
 for writing L<HTML::Template::Expr> in the first place.
 
-=head2 Q: Can I get a copy of these docs in Japanese?
+=head2 Can I get a copy of these docs in Japanese?
 
 Yes you can. See Kawai Takanori's translation at:
 
    http://member.nifty.ne.jp/hippo2000/perltips/html/template.htm
 
-=head2 Q: What's the best way to create a <select> form element using HTML::Template?
+=head2 What's the best way to create a <select> form element using HTML::Template?
 
 There is much disagreement on this issue. My personal preference is
 to use L<CGI.pm>'s excellent C<popup_menu()> and C<scrolling_list()>
-functions to fill in a single C<< <tmpl_var select_foo> > variable.
+functions to fill in a single C<< <tmpl_var select_foo> >> variable.
 
 To some people this smacks of mixing HTML and code in a way that
 they hoped L<HTML::Template> would help them avoid. To them I'd say
