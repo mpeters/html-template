@@ -1,18 +1,16 @@
 #!/usr/bin/perl -w
+use lib '../lib';
+use HTML::Template;
 
 # this is a little script I use to test the timing behavior of various
 # options in HTML::Template;;
 
-# set this to wherever your test area is
-use lib '../lib';
-use HTML::Template;
-
 # an array of template files to test against and params to fill in
 my %templates = (
-    simple  => ['../templates/simple.tmpl', {}],
-    include => ['../templates/include.tmpl'],
+    simple  => ['templates/simple.tmpl', {}],
+    include => ['templates/include.tmpl'],
     medium  => [
-        '../templates/medium.tmpl',
+        'templates/medium.tmpl',
         {
             'ALERT',
             'I am alert.',
@@ -60,8 +58,8 @@ my %templates = (
             "lsadfjlkfjdsgkljhfgklhasgh",
         }
     ],
-    long_loop => ['../templates/long_loops.tmpl', {}],
-    loop_if   => ['../templates/loop-if.tmpl',    {LOOP_ONE => [{VAR => 'foo'}]}]
+    long_loop => ['templates/long_loops.tmpl', {}],
+    loop_if   => ['templates/loop-if.tmpl',    {LOOP_ONE => [{VAR => 'foo'}]}]
 
 );
 
