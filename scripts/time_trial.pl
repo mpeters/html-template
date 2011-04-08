@@ -4,7 +4,8 @@
 # options in HTML::Template;;
 
 # set this to wherever your test area is
-require '../Template.pm';
+use lib '../lib';
+use HTML::Template;
 
 # an array of template files to test against and params to fill in
 my %templates = (
