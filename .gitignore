@@ -3,3 +3,4 @@
 *.bak
 blib
 .build
+file_cache

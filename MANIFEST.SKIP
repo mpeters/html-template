@@ -6,3 +6,4 @@ blib
 \.build$
 ^MYMETA.yml$
 dzil.ini
+file_cache
