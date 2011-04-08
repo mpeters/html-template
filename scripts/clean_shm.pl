@@ -1,4 +1,6 @@
 #!/usr/bin/perl 
+use strict;
+use warnings;
 
 # this script deletes all shared memory segments accessible by the
 # running user.  Probably only works on Linux systems.
