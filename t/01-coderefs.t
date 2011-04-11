@@ -1,5 +1,5 @@
 use strict;
-use Test::More qw(no_plan);
+use Test::More (tests => 1);
 use HTML::Template;
 
 my ($output, $template, $result);
@@ -9,6 +9,6 @@ $template = HTML::Template->new(
     path     => 'templates',
     filename => 'escape.tmpl'
 );
-$template->param(STUFF => sub { '<>"\'' });
+$template->param(STUFF => sub { q(<>"') });
 $output = $template->output;
 ok($output !~ /[<>"']/);    #"
