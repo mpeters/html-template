@@ -4,7 +4,9 @@
 
    - Development: Switched to using Dist::Zilla internally for release management
 
-   - Documenation: Using more POD formatting
+   - Documentation: Using more POD formatting
+
+   - Documentation: RT #46244 - fix broken link to tutorial [Michael Peters]
 
    - Bug Fix: RT #26456 - force_untaint can't work in Perl < 5.8.0
      [admin@photoresearchers.com]
