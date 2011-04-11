@@ -65,6 +65,10 @@ introductory article available on the HTML::Template website:
 
    http://html-template.sourceforge.net
 
+=head1 FAQ
+
+Please see L<HTML::Template::FAQ>
+
 =head1 MOTIVATION
 
 It is true that there are a number of packages out there to do HTML
