@@ -1,8 +1,7 @@
-use Test::More tests => 98;
-#use Test::More qw/no_plan/;
-use HTML::Template;
-
 use strict;
+#use Test::More (tests => 101);
+use Test::More 'no_plan';
+use_ok('HTML::Template');
 
 while (<DATA>) {
     chomp;
@@ -13,6 +12,8 @@ while (<DATA>) {
         scalarref      => \$text,
         default_escape => "HTML"
     );
+
+    undef $given if $given eq 'undef';
     $template->param(foo => $given);
     my $output = $template->output;
     is($output, $wanted, $text);
@@ -132,3 +133,17 @@ __DATA__
 #no escaping and default escaping
 <TMPL_VAR foo ESCAPE=0> <TMPL_VAR foo>|<b>this is bold\n|<b>this is bold\n &lt;b&gt;this is bold\n
 <!-- TMPL_VAR foo ESCAPE=0 --> <!-- TMPL_VAR foo -->|<b>this is bold\n|<b>this is bold\n &lt;b&gt;this is bold\n
+
+# mixing escape and default
+<TMPL_VAR foo default="UNKNOWN VALUE" ESCAPE=HTML>|fl<i>pper|fl&lt;i&gt;pper
+<TMPL_VAR name="foo" default="UNKNOWN VALUE" escape="HTML">|fl<i>pper|fl&lt;i&gt;pper
+<!-- TMPL_VAR NAME="foo" DEFAULT="UNKNOWN VALUE" ESCAPE="HTML" -->|fl<i>pper|fl&lt;i&gt;pper
+<TMPL_VAR foo default="UNKNOWN VALUE" escape="HTML">|undef|UNKNOWN VALUE
+<TMPL_VAR name="foo" default="UNKNOWN VALUE" ESCAPE='html'>|undef|UNKNOWN VALUE
+<!-- TMPL_VAR NAME="foo" DEFAULT="UNKNOWN VALUE" ESCAPE="html" -->|undef|UNKNOWN VALUE
+<TMPL_VAR foo ESCAPE=html default="UNKNOWN VALUE">|fl<i>pper|fl&lt;i&gt;pper
+<TMPL_VAR name="foo" escape="HTML" default="UNKNOWN VALUE">|fl<i>pper|fl&lt;i&gt;pper
+<!-- TMPL_VAR NAME="foo" ESCAPE='HTML' DEFAULT="UNKNOWN VALUE" -->|fl<i>pper|fl&lt;i&gt;pper
+<TMPL_VAR foo escape='html' default="UNKNOWN VALUE">|undef|UNKNOWN VALUE
+<TMPL_VAR name="foo" ESCAPE=HTML default="UNKNOWN VALUE">|undef|UNKNOWN VALUE
+<!-- TMPL_VAR NAME="foo" ESCAPE="HTML" DEFAULT="UNKNOWN VALUE" -->|undef|UNKNOWN VALUE
