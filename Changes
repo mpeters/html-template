@@ -9,6 +9,10 @@
    - Bug Fix: RT #26456 - force_untaint can't work in Perl < 5.8.0
      [admin@photoresearchers.com]
 
+   - Bug Fix: RT #35534 - Using the same template multiple times with
+     different vars will no longer cause an error if die_on_bad_params 
+     is set. [Ron Savage & Michael Peters]
+
    - Test Fix: RT #26103 - t/05-blind-cache.t no longer modifies the
      distribution during the tests but instead uses temp files [Jan
      Dubois and Michael Peters]

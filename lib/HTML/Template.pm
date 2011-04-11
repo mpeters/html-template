@@ -2225,6 +2225,29 @@ sub _parse {
                     parent_global_vars => ($options->{global_vars} || $options->{parent_global_vars} || 0)
                 );
 
+                # if this loop has been used multiple times we need to merge the "param_map" between them
+                # all so that die_on_bad_params doesn't complain if we try to use different vars in
+                # each instance of the same loop
+                if( $options->{die_on_bad_params} ) { 
+                    my $loops = $loop->[HTML::Template::LOOP::TEMPLATE_HASH];
+                    my @loop_keys = sort { $a <=> $b } keys %$loops;
+                    if( @loop_keys > 1 ) {
+                        my $last_loop = pop(@loop_keys);
+                        foreach my $loop (@loop_keys) {
+                            # make sure all the params in the last loop are also in this loop
+                            foreach my $param (keys %{$loops->{$last_loop}->{param_map}}) {
+                                next if $loops->{$loop}->{param_map}->{$param};
+                                $loops->{$loop}->{param_map}->{$param} = $loops->{$last_loop}->{param_map}->{$param};
+                            }
+                            # make sure all the params in this loop are also in the last loop
+                            foreach my $param (keys %{$loops->{$loop}->{param_map}}) {
+                                next if $loops->{$last_loop}->{param_map}->{$param};
+                                $loops->{$last_loop}->{param_map}->{$param} = $loops->{$loop}->{param_map}->{$param};
+                            }
+                        }
+                    }
+                }
+
             } elsif ($which eq 'TMPL_IF' or $which eq 'TMPL_UNLESS') {
                 $options->{debug}
                   and print STDERR "### HTML::Template Debug ### $fname : line $fcounter : $which $name start\n";
