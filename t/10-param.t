@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-use Test::More qw(no_plan);
-# tests => 4;
+use Test::More (tests => 7);
 
 use_ok('HTML::Template');
 
