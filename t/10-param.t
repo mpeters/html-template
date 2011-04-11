@@ -32,6 +32,10 @@ like($@, qr/Single reference arg to param\(\) must be a hash-ref/, "Single refer
 eval { $template->param(bless {'FOOBAR' => 42}, "Puppy") };
 ok(!$@, "param() doesn't die with blessed hash as first arg");
 
+# make sure we can't pass a reference to a reference
+eval { $template->param(\{}) };
+warn "\n\n!!!!!!!!\n$@\n\n";
+
 # odd number of params
 eval { my $value = $template->param('foo' => 1, 'bar') };
 like($@, qr/You gave me an odd number of parameters to param/, "odd number of args to param");
