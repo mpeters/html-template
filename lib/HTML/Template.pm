@@ -61,9 +61,9 @@ section below for more details.
 =head1 TUTORIAL
 
 If you're new to HTML::Template, I suggest you start with the
-introductory article available on the HTML::Template website:
+introductory article available on Perl Monks:
 
-   http://html-template.sourceforge.net
+    http://www.perlmonks.org/?node_id=65642
 
 =head1 FAQ
 
