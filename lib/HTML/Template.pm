@@ -1891,28 +1891,16 @@ sub _parse {
             $chunk =~ /^<
                     (?:!--\s*)?
                     (
-                      \/?[Tt][Mm][Pp][Ll]_
+                      \/?tmpl_
                       (?:
-                         (?:[Vv][Aa][Rr])
-                         |
-                         (?:[Ll][Oo][Oo][Pp])
-                         |
-                         (?:[Ii][Ff])
-                         |
-                         (?:[Ee][Ll][Ss][Ee])
-                         |
-                         (?:[Uu][Nn][Ll][Ee][Ss][Ss])
-                         |
-                         (?:[Ii][Nn][Cc][Ll][Uu][Dd][Ee])
+                         (?:var) | (?:loop) | (?:if) | (?:else) | (?:unless) | (?:include)
                       )
                     ) # $1 => $which - start of the tag
 
                     \s* 
 
                     # DEFAULT attribute
-                    (?:
-                      [Dd][Ee][Ff][Aa][Uu][Ll][Tt]
-                      \s*=\s*
+                    (?: default \s*=\s*
                       (?:
                         "([^">]*)"  # $2 => double-quoted DEFAULT value "
                         |
@@ -1925,17 +1913,15 @@ sub _parse {
                     \s*
 
                     # ESCAPE attribute
-                    (?:
-                      [Ee][Ss][Cc][Aa][Pp][Ee]
-                      \s*=\s*
+                    (?: escape \s*=\s*
                       (?:
                         (
                            (?:["']?0["']?)|
                            (?:["']?1["']?)|
-                           (?:["']?[Hh][Tt][Mm][Ll]["']?) |
-                           (?:["']?[Uu][Rr][Ll]["']?) |
-                           (?:["']?[Jj][Ss]["']?) |
-                           (?:["']?[Nn][Oo][Nn][Ee]["']?)
+                           (?:["']?html["']?) |
+                           (?:["']?url["']?) |
+                           (?:["']?js["']?) |
+                           (?:["']?none["']?)
                          )                         # $5 => ESCAPE on
                        )
                     )* # allow multiple ESCAPEs
@@ -1943,9 +1929,7 @@ sub _parse {
                     \s*
 
                     # DEFAULT attribute
-                    (?:
-                      [Dd][Ee][Ff][Aa][Uu][Ll][Tt]
-                      \s*=\s*
+                    (?: default \s*=\s*
                       (?:
                         "([^">]*)"  # $6 => double-quoted DEFAULT value "
                         |
@@ -1959,10 +1943,7 @@ sub _parse {
 
                     # NAME attribute
                     (?:
-                      (?:
-                        [Nn][Aa][Mm][Ee]
-                        \s*=\s*
-                      )?
+                      (?: name \s*=\s*)?
                       (?:
                         "([^">]*)"  # $9 => double-quoted NAME value "
                         |
@@ -1975,9 +1956,7 @@ sub _parse {
                     \s*
 
                     # DEFAULT attribute
-                    (?:
-                      [Dd][Ee][Ff][Aa][Uu][Ll][Tt]
-                      \s*=\s*
+                    (?: default \s*=\s*
                       (?:
                         "([^">]*)"  # $12 => double-quoted DEFAULT value "
                         |
@@ -1990,17 +1969,15 @@ sub _parse {
                     \s*
 
                     # ESCAPE attribute
-                    (?:
-                      [Ee][Ss][Cc][Aa][Pp][Ee]
-                      \s*=\s*
+                    (?: escape \s*=\s*
                       (?:
                         (
                            (?:["']?0["']?)|
                            (?:["']?1["']?)|
-                           (?:["']?[Hh][Tt][Mm][Ll]["']?) |
-                           (?:["']?[Uu][Rr][Ll]["']?) |
-                           (?:["']?[Jj][Ss]["']?) |
-                           (?:["']?[Nn][Oo][Nn][Ee]["']?)
+                           (?:["']?html["']?) |
+                           (?:["']?url["']?) |
+                           (?:["']?js["']?) |
+                           (?:["']?none["']?)
                          )                         # $15 => ESCAPE on
                        )
                     )* # allow multiple ESCAPEs
@@ -2008,9 +1985,7 @@ sub _parse {
                     \s*
 
                     # DEFAULT attribute
-                    (?:
-                      [Dd][Ee][Ff][Aa][Uu][Ll][Tt]
-                      \s*=\s*
+                    (?: default \s*=\s*
                       (?:
                         "([^">]*)"  # $16 => double-quoted DEFAULT value "
                         |
@@ -2024,7 +1999,7 @@ sub _parse {
 
                     (?:--)?>                    
                     (.*) # $19 => $post - text that comes after the tag
-                   $/sx
+                   $/isx
           )
         {
 
@@ -2104,13 +2079,13 @@ sub _parse {
                 # the variable.  output will handle the actual work.
                 # unless of course, they have set escape=0 or escape=none
                 if ($escape) {
-                    if ($escape =~ /^["']?[Uu][Rr][Ll]["']?$/) {
+                    if ($escape =~ /^["']?url["']?$/i) {
                         push(@pstack, $URLESCAPE);
-                    } elsif ($escape =~ /^["']?[Jj][Ss]["']?$/) {
+                    } elsif ($escape =~ /^["']?js["']?$/i) {
                         push(@pstack, $JSESCAPE);
                     } elsif ($escape =~ /^["']?0["']?$/) {
                         # do nothing if escape=0
-                    } elsif ($escape =~ /^["']?[Nn][Oo][Nn][Ee]["']?$/) {
+                    } elsif ($escape =~ /^["']?none["']?$/i) {
                         # do nothing if escape=none
                     } else {
                         push(@pstack, $ESCAPE);
@@ -2436,7 +2411,7 @@ sub _parse {
                     # make sure we didn't reject something TMPL_* but badly formed
             if ($options->{strict}) {
                 die "HTML::Template->new() : Syntax error in <TMPL_*> tag at $fname : $fcounter."
-                  if ($chunk =~ /<(?:!--\s*)?\/?[Tt][Mm][Pp][Ll]_/);
+                  if ($chunk =~ /<(?:!--\s*)?\/?tmpl_/i);
             }
 
             # push the rest and get next chunk

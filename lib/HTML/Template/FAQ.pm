@@ -74,17 +74,6 @@ If you want your C<< <TMPL_VAR> >>s to be global you can set the
 C<global_vars> option when you call C<new()>. See above for documentation
 of the C<global_vars> C<new()> option.
 
-=head2 Why do you use /[Tt]/ instead of /t/i? It's so ugly!
-
-Simple - the case-insensitive match switch is very inefficient.  According
-to _Mastering_Regular_Expressions_ from O'Reilly Press, /[Tt]/ is faster
-and more space efficient than /t/i - by as much as double against long
-strings. //i essentially does a lc() on the string and keeps a temporary
-copy in memory.
-
-When this changes, and it is in the 5.6 development series, I will gladly
-use //i. Believe me, I realize [Tt] is hideously ugly.
-
 =head2 How can I pre-load my templates using cache-mode and mod_perl?
 
 Add something like this to your startup.pl:
