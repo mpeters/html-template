@@ -147,3 +147,9 @@ __DATA__
 <TMPL_VAR foo escape='html' default="UNKNOWN VALUE">|undef|UNKNOWN VALUE
 <TMPL_VAR name="foo" ESCAPE=HTML default="UNKNOWN VALUE">|undef|UNKNOWN VALUE
 <!-- TMPL_VAR NAME="foo" ESCAPE="HTML" DEFAULT="UNKNOWN VALUE" -->|undef|UNKNOWN VALUE
+<TMPL_VAR ESCAPE=html default="UNKNOWN VALUE" foo>|fl<i>pper|fl&lt;i&gt;pper
+<TMPL_VAR escape="HTML" name="foo" default="UNKNOWN VALUE">|fl<i>pper|fl&lt;i&gt;pper
+<!-- TMPL_VAR ESCAPE='HTML' DEFAULT="UNKNOWN VALUE" NAME="foo" -->|fl<i>pper|fl&lt;i&gt;pper
+<TMPL_VAR escape='html' foo default="UNKNOWN VALUE">|undef|UNKNOWN VALUE
+<TMPL_VAR ESCAPE=HTML name="foo" default="UNKNOWN VALUE">|undef|UNKNOWN VALUE
+<!-- TMPL_VAR ESCAPE="HTML" DEFAULT="UNKNOWN VALUE" name="foo" -->|undef|UNKNOWN VALUE
