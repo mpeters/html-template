@@ -1044,9 +1044,9 @@ sub new {
 
     # make sure taint mode is on if force_untaint flag is set
     if ($options->{force_untaint}) {
-        if( $] < 5.008000 ) {
+        if ($] < 5.008000) {
             warn("HTML::Template->new() : 'force_untaint' option needs at least Perl 5.8.0!");
-        } elsif(!${^TAINT}) {
+        } elsif (!${^TAINT}) {
             croak("HTML::Template->new() : 'force_untaint' option set but perl does not run in taint mode!");
         }
     }
@@ -2228,10 +2228,10 @@ sub _parse {
                 # if this loop has been used multiple times we need to merge the "param_map" between them
                 # all so that die_on_bad_params doesn't complain if we try to use different vars in
                 # each instance of the same loop
-                if( $options->{die_on_bad_params} ) { 
+                if ($options->{die_on_bad_params}) {
                     my $loops = $loop->[HTML::Template::LOOP::TEMPLATE_HASH];
                     my @loop_keys = sort { $a <=> $b } keys %$loops;
-                    if( @loop_keys > 1 ) {
+                    if (@loop_keys > 1) {
                         my $last_loop = pop(@loop_keys);
                         foreach my $loop (@loop_keys) {
                             # make sure all the params in the last loop are also in this loop
@@ -2652,19 +2652,19 @@ sub param {
 
         # figure out what we've got, taking special care to allow for
         # objects that are compatible underneath.
-        if (my $value_type = ref $value) {
-            if( $value_type eq 'REF' ) {
-              croak("HTML::Template::param() : attempt to set parameter '$param' with a reference to a reference");
-            } elsif( $value_type eq 'ARRAY' || ($value_type !~ /^(CODE)|(HASH)|(SCALAR)|(REF)$/ && $value->isa('ARRAY'))) {
-                (ref($param_map->{$param}) eq 'HTML::Template::LOOP')
-                  or croak(
-                    "HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!");
-            }
+        my $type = ref $value || '';
+        if ($type eq 'REF') {
+            croak("HTML::Template::param() : attempt to set parameter '$param' with a reference to a reference!");
+        } elsif ($type eq 'ARRAY' || ($type !~ /^(CODE)|(HASH)|(SCALAR)$/ && $value->isa('ARRAY'))) {
+            ref($param_map->{$param}) eq 'HTML::Template::LOOP'
+              || croak(
+                "HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!");
             $param_map->{$param}[HTML::Template::LOOP::PARAM_SET] = [@{$value}];
+        } elsif ($type eq 'REF') {
         } else {
-            (ref($param_map->{$param}) eq 'HTML::Template::VAR')
-              or
-              croak("HTML::Template::param() : attempt to set parameter '$param' with a scalar - parameter is not a TMPL_VAR!");
+            ref($param_map->{$param}) eq 'HTML::Template::VAR'
+              || croak(
+                "HTML::Template::param() : attempt to set parameter '$param' with a scalar - parameter is not a TMPL_VAR!");
             ${$param_map->{$param}} = $value;
         }
     }
