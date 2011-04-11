@@ -1,6 +1,5 @@
 use strict;
-#use Test::More (tests => 101);
-use Test::More 'no_plan';
+use Test::More (tests => 117);
 use_ok('HTML::Template');
 
 while (<DATA>) {
