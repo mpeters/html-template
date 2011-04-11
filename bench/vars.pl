@@ -54,16 +54,16 @@ timethese(
             $tmpl->param(
                 propname           => 'foo',
                 javascript         => '<script type="text/javascript">aler("hi!")</script>',
-                hotel_key          => 'bar',
-                alert              => 'Danger!',
+                hotel_key          => 'bar&>?/',
+                alert              => 'Danger!&!',
                 new_comment_button => '<input type="button" name="new_comment">Click Me!</input>',
                 comments           => [
                     {
                         color     => 'black',
-                        posted_by => 'me',
-                        posted_on => 'yesterday',
+                        posted_by => 'me & you',
+                        posted_on => '<yesterday>',
                         stars     => '10',
-                        comment   => 'Super duper cool stuff!',
+                        comment   => 'Super & duper cool stuff!',
                         approval_button =>
                           '<input type="button" name="approve_comment">No, Click Me!</input>',
                         edit_button =>
@@ -73,10 +73,10 @@ timethese(
                     },
                     {
                         color     => 'blue',
-                        posted_by => 'you',
-                        posted_on => '2 days ago',
+                        posted_by => 'you & I',
+                        posted_on => '2 days <ago>',
                         stars     => '5',
-                        comment   => 'It is ok',
+                        comment   => 'It is ok <really>',
                         approval_button =>
                           '<input type="button" name="approve_comment">No, Click Me!</input>',
                         edit_button =>
@@ -86,10 +86,10 @@ timethese(
                     },
                     {
                         color     => 'yellow',
-                        posted_by => 'someone',
-                        posted_on => '4 days ago',
+                        posted_by => 'someone & someone else',
+                        posted_on => '4 days <ago>',
                         stars     => '4',
-                        comment   => 'It would not kill me to go back',
+                        comment   => 'It would not kill me to go back & spend more time there',
                         approval_button =>
                           '<input type="button" name="approve_comment">No, Click Me!</input>',
                         edit_button =>
@@ -99,10 +99,10 @@ timethese(
                     },
                     {
                         color     => 'blue',
-                        posted_by => 'someone else',
-                        posted_on => '4 days ago',
+                        posted_by => 'someone else!&!',
+                        posted_on => '<4 days ago>',
                         stars     => '6',
-                        comment   => 'I enjoyed the bed',
+                        comment   => 'I enjoyed the <bed>',
                         approval_button =>
                           '<input type="button" name="approve_comment">No, Click Me!</input>',
                         edit_button =>
@@ -112,7 +112,7 @@ timethese(
                     },
                     {
                         color     => 'red',
-                        posted_by => 'someone else',
+                        posted_by => 'someone else <&>',
                         stars     => '6',
                         approval_button =>
                           '<input type="button" name="approve_comment">No, Click Me!</input>',

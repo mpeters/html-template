@@ -191,11 +191,11 @@
 
 	<TR>
 		<TD WIDTH="72" ALIGN="left" ROWSPAN="2"><IMG SRC="/images/hotel/hotel_door_sidetop.gif" ALT="WPP Hotel Directory" WIDTH="72" HEIGHT="18" BORDER="0"><IMG SRC="/images/hotel/hotel_door_sidebottom.gif" ALT="WPP Hotel Directory" WIDTH="72" HEIGHT="99" BORDER="0"></TD>
-		<TD WIDTH="540" ALIGN="left" COLSPAN="2"><FONT FACE="ARIAL, GENEVA" SIZE="4" COLOR="#993300"><B><TMPL_VAR PROPNAME></B></FONT></TD>
+		<TD WIDTH="540" ALIGN="left" COLSPAN="2"><FONT FACE="ARIAL, GENEVA" SIZE="4" COLOR="#993300"><B><TMPL_VAR PROPNAME ESCAPE=HTML></B></FONT></TD>
 	</TR>
 	
 	<TR>		
-		<TD ALIGN=LEFT VALIGN=TOP><IMG SRC="/images/hotel/hotel_door_info_3.gif" NAME="img4" WIDTH="50" HEIGHT="99" BORDER="0" ALT="General Info"><a href="javascript:submit_form('hotel_rate')" onmouseover = "imgOn('img5')" onmouseout = "imgOff('img5')"><IMG SRC="/images/hotel/hotel_door_rate_1.gif" NAME="img5" ALT="Rates and Charges" WIDTH="50" HEIGHT="99" BORDER="0"></a><a href="javascript:submit_form('hotel_fac')" onmouseover = "imgOn('img6')" onmouseout = "imgOff('img6')"><IMG SRC="/images/hotel/hotel_door_fac_1.gif" NAME="img6" ALT="Facilities and Amenities" WIDTH="56" HEIGHT="99" BORDER="0"></a><a href="javascript:submit_form('hotel_pol')" onmouseover = "imgOn('img7')" onmouseout = "imgOff('img7')"><IMG SRC="/images/hotel/hotel_door_pol_1.gif" NAME="img7" ALT="Policies" WIDTH="47" HEIGHT="99" BORDER="0"></a><a href="javascript:submit_form('hotel_area')" onmouseover = "imgOn('img8')" onmouseout = "imgOff('img8')"><IMG SRC="/images/hotel/hotel_door_area_1.gif" NAME="img8" ALT="Also in the area" WIDTH="57" HEIGHT="99" BORDER="0"></a><a href="comments.cgi?hotelkey=<TMPL_VAR HOTEL_KEY>" onmouseover = "imgOn('imgCOM')" onmouseout = "imgOff('imgCOM')"><IMG SRC="/images/hotel/hotel_comments_1.gif" NAME="imgCOM" ALT="Comments" WIDTH="63" HEIGHT="99" BORDER="0"></a></TD>
+		<TD ALIGN=LEFT VALIGN=TOP><IMG SRC="/images/hotel/hotel_door_info_3.gif" NAME="img4" WIDTH="50" HEIGHT="99" BORDER="0" ALT="General Info"><a href="javascript:submit_form('hotel_rate')" onmouseover = "imgOn('img5')" onmouseout = "imgOff('img5')"><IMG SRC="/images/hotel/hotel_door_rate_1.gif" NAME="img5" ALT="Rates and Charges" WIDTH="50" HEIGHT="99" BORDER="0"></a><a href="javascript:submit_form('hotel_fac')" onmouseover = "imgOn('img6')" onmouseout = "imgOff('img6')"><IMG SRC="/images/hotel/hotel_door_fac_1.gif" NAME="img6" ALT="Facilities and Amenities" WIDTH="56" HEIGHT="99" BORDER="0"></a><a href="javascript:submit_form('hotel_pol')" onmouseover = "imgOn('img7')" onmouseout = "imgOff('img7')"><IMG SRC="/images/hotel/hotel_door_pol_1.gif" NAME="img7" ALT="Policies" WIDTH="47" HEIGHT="99" BORDER="0"></a><a href="javascript:submit_form('hotel_area')" onmouseover = "imgOn('img8')" onmouseout = "imgOff('img8')"><IMG SRC="/images/hotel/hotel_door_area_1.gif" NAME="img8" ALT="Also in the area" WIDTH="57" HEIGHT="99" BORDER="0"></a><a href="comments.cgi?hotelkey=<TMPL_VAR HOTEL_KEY ESCAPE=URL>" onmouseover = "imgOn('imgCOM')" onmouseout = "imgOff('imgCOM')"><IMG SRC="/images/hotel/hotel_comments_1.gif" NAME="imgCOM" ALT="Comments" WIDTH="63" HEIGHT="99" BORDER="0"></a></TD>
 
 	</TR>
 </TABLE>
@@ -204,12 +204,12 @@
 
 <FORM ACTION=comments.cgi METHOD=POST>
 <INPUT TYPE=HIDDEN NAME=rm VALUE=command>
-<INPUT TYPE=HIDDEN NAME=hotelkey VALUE=<TMPL_VAR HOTEL_KEY>>
+<INPUT TYPE=HIDDEN NAME=hotelkey VALUE=<TMPL_VAR HOTEL_KEY ESCAPE=HTML>>
 
 <TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" WIDTH="613">
 
 <TR>
-	<TD WIDTH="200" ALIGN=LEFT VALIGN=TOP><a href="#top" onmouseover = "imgOn('imgTopA')" onmouseout = "imgOff('imgTopA')"><IMG SRC="/images/hotel/hotel_top_1.gif" NAME="imgTopA" ALT="Back to the top" WIDTH="31" HEIGHT="29" BORDER="0"></A><FONT SIZE="+1" COLOR="#000000" FACE="ARIAL, GENEVA">Vistor Comments<TMPL_VAR ALERT></FONT></TD>
+	<TD WIDTH="200" ALIGN=LEFT VALIGN=TOP><a href="#top" onmouseover = "imgOn('imgTopA')" onmouseout = "imgOff('imgTopA')"><IMG SRC="/images/hotel/hotel_top_1.gif" NAME="imgTopA" ALT="Back to the top" WIDTH="31" HEIGHT="29" BORDER="0"></A><FONT SIZE="+1" COLOR="#000000" FACE="ARIAL, GENEVA">Vistor Comments<TMPL_VAR ALERT ESCAPE=HTML></FONT></TD>
         <TD ALIGN=RIGHT><TMPL_VAR NEW_COMMENT_BUTTON></TD>
 </TR>
 
@@ -225,18 +225,18 @@
    <TR>
 
    <TD BGCOLOR=<TMPL_VAR COLOR>><FONT SIZE="-1" COLOR="#000000" FACE="ARIAL, GENEVA">
-   <B>Posted by:</B> <TMPL_VAR NAME=posted_by> <TMPL_VAR NAME=posted_on>
+   <B>Posted by:</B> <TMPL_VAR NAME=posted_by ESCAPE=HTML> <TMPL_VAR NAME=posted_on ESCAPE=HTML>
    </TD>
 
    <TD BGCOLOR=<TMPL_VAR COLOR>><FONT SIZE="-1" COLOR="#000000" FACE="ARIAL, GENEVA">
-   <B>Rating:</B> <TMPL_VAR NAME=stars>
+   <B>Rating:</B> <TMPL_VAR NAME=stars ESCAPE=HTML>
    </TD>
    </TR>
 
    <TR>
    <TD BGCOLOR=<TMPL_VAR COLOR> COLSPAN=2><FONT SIZE="-1" COLOR="#000000" FACE="ARIAL, GENEVA">
    <B>Comment</B><BR>
-   <TMPL_VAR NAME=comment><BR>
+   <TMPL_VAR NAME=comment ESCAPE=HTML><BR>
    <TMPL_VAR NAME=approval_button><TMPL_VAR NAME=edit_button><TMPL_VAR NAME=delete_button><BR>
    </TD>
    </TR>
@@ -254,18 +254,18 @@
    <TR>
 
    <TD BGCOLOR=<TMPL_VAR COLOR>><FONT SIZE="-1" COLOR="#000000" FACE="ARIAL, GENEVA">
-   <B>Posted by:</B> <TMPL_VAR NAME=posted_by> <TMPL_VAR NAME=posted_on>
+   <B>Posted by:</B> <TMPL_VAR NAME=posted_by ESCAPE=HTML> <TMPL_VAR NAME=posted_on ESCAPE=HTML>
    </TD>
 
    <TD BGCOLOR=<TMPL_VAR COLOR>><FONT SIZE="-1" COLOR="#000000" FACE="ARIAL, GENEVA">
-   <B>Rating:</B> <TMPL_VAR NAME=stars>
+   <B>Rating:</B> <TMPL_VAR NAME=stars ESCAPE=HTML>
    </TD>
    </TR>
 
    <TR>
    <TD BGCOLOR=<TMPL_VAR COLOR> COLSPAN=2><FONT SIZE="-1" COLOR="#000000" FACE="ARIAL, GENEVA">
    <B>Comment</B><BR>
-   <TMPL_VAR NAME=comment><BR>
+   <TMPL_VAR NAME=comment ESCAPE=HTML><BR>
    <TMPL_VAR NAME=ok_button><TMPL_VAR NAME=cancel_button><BR>
    </TD>
    </TR>
@@ -283,7 +283,7 @@
    <TR>
 
    <TD BGCOLOR=#FFFFFF><FONT COLOR="#000000" FACE="ARIAL, GENEVA">
-   Thank you for you comment <TMPL_VAR NAME=posted_by>!<BR>
+   Thank you for you comment <TMPL_VAR NAME=posted_by ESCAPE=HTML>!<BR>
    The moderators have been notified of your new comment - they will review it as soon as possible.<P>
 <INPUT TYPE=SUBMIT NAME=list VALUE="Return to the Vistor Comments List"><BR>&nbsp;
 
