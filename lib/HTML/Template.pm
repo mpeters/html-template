@@ -2652,17 +2652,14 @@ sub param {
 
         # figure out what we've got, taking special care to allow for
         # objects that are compatible underneath.
-        my $value_type = ref($value);
-        if (
-                defined($value_type)
-            and length($value_type)
-            and ($value_type eq 'ARRAY'
-                or ((ref($value) !~ /^(CODE)|(HASH)|(SCALAR)$/) and $value->isa('ARRAY')))
-          )
-        {
-            (ref($param_map->{$param}) eq 'HTML::Template::LOOP')
-              or croak(
-                "HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!");
+        if (my $value_type = ref $value) {
+            if( $value_type eq 'REF' ) {
+              croak("HTML::Template::param() : attempt to set parameter '$param' with a reference to a reference");
+            } elsif( $value_type eq 'ARRAY' || ($value_type !~ /^(CODE)|(HASH)|(SCALAR)|(REF)$/ && $value->isa('ARRAY'))) {
+                (ref($param_map->{$param}) eq 'HTML::Template::LOOP')
+                  or croak(
+                    "HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!");
+            }
             $param_map->{$param}[HTML::Template::LOOP::PARAM_SET] = [@{$value}];
         } else {
             (ref($param_map->{$param}) eq 'HTML::Template::VAR')

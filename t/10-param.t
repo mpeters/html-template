@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More (tests => 7);
+use Test::More (tests => 9);
 
 use_ok('HTML::Template');
 
@@ -34,11 +34,16 @@ ok(!$@, "param() doesn't die with blessed hash as first arg");
 
 # make sure we can't pass a reference to a reference
 eval { $template->param(\{}) };
-warn "\n\n!!!!!!!!\n$@\n\n";
+like($@, qr/must be a hash-ref/i, 'reference to a hash-ref is still bad');
 
 # odd number of params
 eval { my $value = $template->param('foo' => 1, 'bar') };
 like($@, qr/You gave me an odd number of parameters to param/, "odd number of args to param");
+
+# value is a reference to a reference
+$template = HTML::Template->new_scalar_ref(\'<tmpl_var foo>');
+eval { $template->param(foo => \{}) };
+like($@, qr/a reference to a reference/i, 'trying to use a reference to a reference');
 
 =head1 NAME
 
