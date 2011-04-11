@@ -2655,12 +2655,11 @@ sub param {
         my $type = ref $value || '';
         if ($type eq 'REF') {
             croak("HTML::Template::param() : attempt to set parameter '$param' with a reference to a reference!");
-        } elsif ($type eq 'ARRAY' || ($type !~ /^(CODE)|(HASH)|(SCALAR)$/ && $value->isa('ARRAY'))) {
+        } elsif ($type && ($type eq 'ARRAY' || ($type !~ /^(CODE)|(HASH)|(SCALAR)$/ && $value->isa('ARRAY')))) {
             ref($param_map->{$param}) eq 'HTML::Template::LOOP'
               || croak(
                 "HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!");
             $param_map->{$param}[HTML::Template::LOOP::PARAM_SET] = [@{$value}];
-        } elsif ($type eq 'REF') {
         } else {
             ref($param_map->{$param}) eq 'HTML::Template::VAR'
               || croak(
