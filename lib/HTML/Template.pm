@@ -114,41 +114,68 @@ When the template is output the C<< <TMPL_VAR>  >> is replaced with the
 VALUE text you specified.  If you don't set a parameter it just gets
 skipped in the output.
 
-Optionally you can use the C<ESCAPE=HTML> option in the tag to indicate
-that you want the value to be HTML-escaped before being returned from
-output. This means that the ", <, >, and & characters get translated
-into &quot;, &lt;, &gt; and &amp; respectively.  This is useful when
-you want to use a TMPL_VAR in a context where those characters would
-cause trouble.  Example:
+You can also specify the value of the parameter as a code reference in order
+to have "lazy" variables. These sub routines will only be referenced if the
+variables are used. See L<LAZY VALUES> for more information.
 
-   <input name=param type=text value="<TMPL_VAR NAME="PARAM">">
+=head3 Attributes
 
-If you called C<param()> with a value like sam"my you'll get in trouble
+The following "attributes" can also be specified in template var tags:
+
+=over
+
+=item * escape
+
+This allows you to escape the value before it's put into the output. Th
+
+This is useful when you want to use a TMPL_VAR in a context where those characters would
+cause trouble. For example:
+
+   <input name=param type=text value="<TMPL_VAR PARAM>">
+
+If you called C<param()> with a value like C<sam"my> you'll get in trouble
 with HTML's idea of a double-quote.  On the other hand, if you use
-ESCAPE=HTML, like this:
+C<escape=html>, like this:
 
-   <input name=param type=text value="<TMPL_VAR ESCAPE=HTML NAME="PARAM">">
+   <input name=param type=text value="<TMPL_VAR PARAM ESCAPE=HTML>">
 
 You'll get what you wanted no matter what value happens to be passed
-in for param.  You can also write C<ESCAPE="HTML">, C<ESCAPE='HTML'>
-and C<ESCAPE='1'>.
+in for param.
 
-C<ESCAPE=0> and C<ESCAPE=NONE> turn off escaping, which is the default
-behavior.
+The following escape values are supported:
 
-There is also the C<"ESCAPE=URL"> option which may be used for VARs that
-populate a URL.  It will do URL escaping, like replacing ' ' with '+'
-and '/' with '%2F'.
+=over
 
-There is also the C<"ESCAPE=JS"> option which may be used for VARs
-that need to be placed within a Javascript string. All \n, \r, ' and "
-characters are escaped.
+=item * html
 
-You can assign a default value to a variable with the C<DEFAULT>
-attribute.  For example, this will output "the devil gave me a taco"
-if the "who" variable is not set.
+Replaces the following characters with their HTML entity equivalent:
+C<&>, C<">, C<'>, C<< < >>, C<< > >>
 
-    The <TMPL_VAR NAME=WHO DEFAULT=devil> gave me a taco.
+=item * js
+
+Escapes (with a backslash) the following characters: C<\>, C<'>, C<">,
+C<\n>, C<\r>
+
+=item * url
+
+URL escapes any ASCII characters except for letters, numbers, C<_>, C<.> and C<->.
+
+=item * none 
+
+Performs no escaping. This is the default, but it's useful to be able to explicitly
+turn off escaping if you are using the C<default_escape> option.
+
+=back
+
+=item * default
+
+With this attribute you can assign a default value to a variable.
+For example, this will output "the devil gave me a taco" if the C<who>
+variable is not set.
+
+    <TMPL_VAR WHO DEFAULT="the devil"> gave me a taco.
+
+=back
 
 =head2 TMPL_LOOP
 
@@ -162,21 +189,21 @@ Now you pass to C<param()> a list (an array ref) of parameter assignments
 output from the text block for each pass.  Unset parameters are skipped.
 Here's an example:
 
- In the template:
+In the template:
 
    <TMPL_LOOP NAME=EMPLOYEE_INFO>
       Name: <TMPL_VAR NAME=NAME> <br>
       Job:  <TMPL_VAR NAME=JOB>  <p>
    </TMPL_LOOP>
 
- In your Perl code:
+In your Perl code:
 
     $template->param(
         EMPLOYEE_INFO => [{name => 'Sam', job => 'programmer'}, {name => 'Steve', job => 'soda jerk'}]
     );
     print $template->output();
   
- The output is:
+The output is:
 
     Name: Sam
     Job: programmer
@@ -2639,6 +2666,13 @@ sub param {
               || croak(
                 "HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!");
             $param_map->{$param}[HTML::Template::LOOP::PARAM_SET] = [@{$value}];
+        } elsif( $type eq 'CODE' ) {
+            # code can be used for a var or a loop
+            if( ref($param_map->{$param}) eq 'HTML::Template::LOOP' ) {
+                $param_map->{$param}[HTML::Template::LOOP::PARAM_SET] = $value;
+            } else {
+                ${$param_map->{$param}} = $value;
+            }
         } else {
             ref($param_map->{$param}) eq 'HTML::Template::VAR'
               || croak(
@@ -2807,14 +2841,20 @@ sub output {
                                 $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
                                   if ${$line->[HTML::Template::COND::VARIABLE]}->($self);
                             } else {
-                                $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
-                                  if ${$line->[HTML::Template::COND::VARIABLE]};
+                                $x = $line->[HTML::Template::COND::JUMP_ADDRESS] if ${$line->[HTML::Template::COND::VARIABLE]};
                             }
                         }
                     } else {
-                        $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
-                          if (defined $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET]
-                            and scalar @{$line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET]});
+                        # if it's a code reference, execute it to get the values
+                        my $loop_values = $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET];
+                        if (defined $loop_values && ref $loop_values eq 'CODE') {
+                            $loop_values = $loop_values->($self);
+                        }
+
+                        # if we have anything for the loop, jump to the next part
+                        if (defined $loop_values && @$loop_values) {
+                            $x = $line->[HTML::Template::COND::JUMP_ADDRESS];
+                        }
                     }
                 } else {
                     if ($line->[HTML::Template::COND::VARIABLE_TYPE] == HTML::Template::COND::VARIABLE_TYPE_VAR) {
@@ -2830,9 +2870,21 @@ sub output {
                             $x = $line->[HTML::Template::COND::JUMP_ADDRESS];
                         }
                     } else {
-                        $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
-                          if ( not defined $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET]
-                            or not scalar @{$line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET]});
+                        # if we don't have anything for the loop, jump to the next part
+                        my $loop_values = $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET];
+                        if(!defined $loop_values) {
+                            $x = $line->[HTML::Template::COND::JUMP_ADDRESS];
+                        } else {
+                            # check to see if the loop is a code ref and if it is execute it to get the values
+                            if( ref $loop_values eq 'CODE' ) {
+                                $loop_values = $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET]->($self);
+                            }
+
+                            # if we don't have anything in the loop, jump to the next part
+                            if(!@$loop_values) {
+                                $x = $line->[HTML::Template::COND::JUMP_ADDRESS];
+                            }
+                        }
                     }
                 }
             }
@@ -3122,6 +3174,14 @@ sub output {
     my $result = '';
     my $count  = 0;
     my $odd    = 0;
+
+    # execute the code to get the values if it's a code reference
+    if( ref $value_sets_array eq 'CODE' ) {
+        $value_sets_array = $value_sets_array->($template);
+        croak("HTML::Template->output: TMPL_LOOP code reference did not return an ARRAY reference!") 
+          unless ref $value_sets_array && ref $value_sets_array eq 'ARRAY';
+    }
+
     foreach my $value_set (@$value_sets_array) {
         if ($loop_context_vars) {
             if ($count == 0) {
@@ -3207,6 +3267,74 @@ sub STORE {
 }
 1;
 __END__
+
+=head1 LAZY VALUES
+
+As mentioned above, both C<TMPL_VAR> and C<TMPL_LOOP> values can be code
+references.  These code references are only executed if the variable or
+loop is used in the template.  This is extremely useful if you want to
+make a variable available to template designers but it can be expensive
+to calculate, so you only want to do so if you have to.
+
+Maybe an example will help to illustrate. Let's say you have a template
+like this:
+
+    <tmpl_if we_care>
+      <tmpl_if life_universe_and_everything>
+    </tmpl_if>
+
+If C<life_universe_and_everything> is expensive to calculate we can
+wrap it's calculation in a code reference and HTML::Template will only
+execute that code if C<we_care> is also true.
+
+    $tmpl->param(life_universe_and_everything => sub { calculate_42() });
+
+Your code reference will be given a single argument, the HTML::Template
+object in use. In the above example, if we wanted C<calculate_42()>
+to have this object we'd do something like this:
+
+    $tmpl->param(life_universe_and_everything => sub { calculate_42(shift) });
+
+This same approach can be used for C<TMPL_LOOP>s too:
+
+    <tmpl_if we_care>
+      <tmpl_loop needles_in_haystack>
+        Found <tmpl_var __counter>!
+      </tmpl_loop>
+    </tmpl_if>
+
+And in your Perl code:
+
+    $tmpl->param(needles_in_haystack => sub { find_needles() });
+
+The only difference in the C<TMPL_LOOP> case is that the subroutine
+needs to return a reference to an ARRAY, not just a scalar value.
+
+=head2 Multiple Calls
+
+It's important to recognize that while this feature is designed
+to save processing time when things aren't needed, if you're not
+careful it can actually increase the number of times you perform your
+calculation. HTML::Template calls your code reference each time it seems
+your loop in the template, this includes the times that you might use
+the loop in a conditional (C<TMPL_IF> or C<TMPL_UNLESS>). For instance:
+
+    <tmpl_if we care>
+      <tmpl_if needles_in_haystack>
+          <tmpl_loop needles_in_haystack>
+            Found <tmpl_var __counter>!
+          </tmpl_loop>
+      <tmpl_else>
+        No needles found!
+      </tmpl_if>
+    </tmpl_if>
+
+This will actually call C<find_needles()> twice which will be even worse
+than you had before.  One way to work around this is to cache the return
+value yourself:
+
+    my $needles;
+    $tmpl->param(needles_in_haystack => sub { defined $needles ? $needles : $needles = find_needles() });
 
 =head1 BUGS
 
