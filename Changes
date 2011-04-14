@@ -29,8 +29,11 @@
      Perl IO layers to interact when using open() on the template files
      [moritz@faui2k3.org and Michael Peters]
 
-    - Feature: RT #46285 - Added support for lazily-evaluated coderefs
-      for TMPL_LOOPs. [Justin DeVuyst and Michael Peters]
+   - Feature: RT #38189 - Allow clean XML style tags "<tmpl_var foo />"
+     to be used as well. [allard@byte.nl]
+
+   - Feature: RT #46285 - Added support for lazily-evaluated coderefs
+     for TMPL_LOOPs. [Justin DeVuyst and Michael Peters]
 
 2.9 Mon Jan 29 15:54:03 EST 2007
    - New Feature: the new force_untaint option makes sure you do not

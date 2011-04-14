@@ -2028,7 +2028,7 @@ sub _parse {
 
                     \s*
 
-                    (?:--)?>                    
+                    (?:--)?\/?>                    
                     (.*) # $19 => $post - text that comes after the tag
                    $/isx
           )

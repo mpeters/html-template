@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More (tests => 8);
+use Test::More (tests => 9);
 use_ok('HTML::Template');
 
 # testing line 1978
@@ -27,24 +27,25 @@ eval { HTML::Template->new_scalar_ref(\$tmpl_text) };
 
 like($@, qr/DEFAULT option invalid/, "Escape not in TMPL_VAR");
 
-SKIP: {
-    skip("doesn't do the check yet", 2);
-    # testing line 1984 else
-    # not quite checking 1984, deserves some sober attention
-    $tmpl_text = <<EOT;
-         <TMPL_HUH NAME=ZAH>
-             Name: <TMPL_VAR NAME=NAME> <br>
-             Job:  <TMPL_VAR NAME=JOB>  <p>
-          </TMPL_HUH>
+# testing line 1984 else
+# not quite checking 1984, deserves some sober attention
+$tmpl_text = <<EOT;
+     <TMPL_HUH NAME=ZAH>
+         Name: <TMPL_VAR NAME=NAME> <br>
+         Job:  <TMPL_VAR NAME=JOB>  <p>
+      </TMPL_HUH>
 EOT
+ok(HTML::Template->new_scalar_ref(\$tmpl_text, strict => 0), "Ignores invalid TMPL tags with strict off");
 
-    ok(HTML::Template->new_scalar_ref(\$tmpl_text, strict => 0), "Ignores invalid TMPL tags with strict off");
+# now with strict on
+eval { HTML::Template->new_scalar_ref(\$tmpl_text, strict => 1) };
+like($@, qr/Syntax error/, "Spits at invalid TMPL tag with strict on");
 
-    #test not working. Get back to it later
-    eval { HTML::Template->new_scalar_ref(\$tmpl_text, strict => 0) };
-
-    like($@, qr/Unknown or unmatched TMPL construct/, "Spits at invalid TMPL tag with strict on");
-}    # END SKIP BLOCK
+# make sure we can use <tmpl_var foo> and <tmpl_var foo /> syntax
+my $tmpl = HTML::Template->new(scalarref => \'<tmpl_var foo>:<tmpl_var foo />');
+$tmpl->param(foo => 'a');
+my $output = $tmpl->output;
+is($output, 'a:a', 'both var forms worked');
 
 # attempting to check lines 1540-44
 # test using HTML_TEMPLATE_ROOT with path
