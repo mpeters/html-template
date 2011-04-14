@@ -205,7 +205,7 @@ ok($output =~ /David/);
 # test escapeing
 $template = HTML::Template->new(
     path     => 'templates',
-    filename => 'escape.tmpl',
+    filename => 'html_escape.tmpl',
     # debug => 1,
 );
 $template->param(STUFF => '<>"\'');    #"
