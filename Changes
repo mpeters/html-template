@@ -1,30 +1,5 @@
 2.10 (in development)
-   - Development: Moved development to GitHub
-     (https://github.com/mpeters/html-template)
 
-   - Development: Switched to using Dist::Zilla internally for release management
-
-   - Documentation: Using more POD formatting
-
-   - Documentation: RT #46244 - fix broken link to tutorial [Michael Peters]
-
-   - Bug Fix: RT #26456 - force_untaint can't work in Perl < 5.8.0
-     [admin@photoresearchers.com]
-
-   - Bug Fix: RT #35534 - Using the same template multiple times with
-     different vars will no longer cause an error if die_on_bad_params 
-     is set. [Ron Savage & Michael Peters]
-
-   - Bug Fix: RT #38325 - Give a better error message if param() is set
-     with a reference to reference. [Mark Stosberg & Michael Peters]
-
-   - Test Fix: RT #26103 - t/05-blind-cache.t no longer modifies the
-     distribution during the tests but instead uses temp files [Jan
-     Dubois and Michael Peters]
-
-   - Test Fix: Tests that create and modify files now use temp files
-     and file_cache_dir is always a temp directory.
- 
    - Feature: RT #30586 - Added support for open_mode option to allow for
      Perl IO layers to interact when using open() on the template files
      [moritz@faui2k3.org and Michael Peters]
@@ -34,6 +9,32 @@
 
    - Feature: RT #46285 - Added support for lazily-evaluated coderefs
      for TMPL_LOOPs. [Justin DeVuyst and Michael Peters]
+
+   - Bug Fix: RT #26456 - force_untaint can't work in Perl < 5.8.0
+     [admin@photoresearchers.com]
+
+   - Bug Fix: RT #35534 - Using the same loop multiple times with
+     different vars will no longer cause an error if die_on_bad_params 
+     is set. [Ron Savage & Michael Peters]
+
+   - Bug Fix: RT #38325 - Give a better error message if param() is set
+     with a reference to a reference. [Mark Stosberg & Michael Peters]
+
+   - Test Fix: RT #26103 - t/05-blind-cache.t no longer modifies the
+     distribution during the tests but instead uses temp files [Jan
+     Dubois and Michael Peters]
+
+   - Test Fix: Tests that create and modify files now use temp files
+     and file_cache_dir is always a temp directory.
+
+   - Documentation: Using more POD formatting
+
+   - Documentation: RT #46244 - fix broken link to tutorial [Michael Peters]
+
+   - Development: Moved development to GitHub
+     (https://github.com/mpeters/html-template)
+
+   - Development: Switched to using Dist::Zilla internally for release management
 
 2.9 Mon Jan 29 15:54:03 EST 2007
    - New Feature: the new force_untaint option makes sure you do not
