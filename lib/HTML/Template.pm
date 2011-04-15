@@ -1452,10 +1452,11 @@ sub _cache_key {
     # assemble pieces of the key
     my @key = ($options->{filepath});
     push(@key, @{$options->{path}});
+
     push(@key, $options->{search_path_on_include} || 0);
-    push(@key, $options->{loop_context_vars} || 0);
-    push(@key, $options->{global_vars} || 0);
-    push(@key, $options->{open_mode} || 0);
+    push(@key, $options->{loop_context_vars}      || 0);
+    push(@key, $options->{global_vars}            || 0);
+    push(@key, $options->{open_mode}              || 0);
 
     # compute the md5 and return it
     return md5_hex(@key);
