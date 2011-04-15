@@ -60,6 +60,8 @@
 
    - Development: Switched to using Dist::Zilla internally for release management
 
+   - Development: Added Michael Peters as co-maintainer
+
 2.9 Mon Jan 29 15:54:03 EST 2007
    - New Feature: the new force_untaint option makes sure you do not
      pass tainted values to param(). [Sven Neuhaus]
