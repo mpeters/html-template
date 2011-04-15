@@ -14,7 +14,12 @@
      for TMPL_LOOPs. [Justin DeVuyst and Michael Peters]
 
    - Feature: Add new cache_lazy_vars option so that the values from coderefs
-     used for TMPL_VARs can be cached [Michael Peters]
+     used for TMPL_VARs can be cached and the coderef not run multiple times 
+     [Michael Peters]
+
+   - Feature: Add new cache_lazy_loops option so that the values from coderefs
+     used for TMPL_LOOPs can be cached and the coderef not run multiple times 
+     [Michael Peters]
 
    - Bug Fix: RT #26456 - force_untaint can't work in Perl < 5.8.0
      [admin@photoresearchers.com]

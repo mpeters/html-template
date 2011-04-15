@@ -637,6 +637,11 @@ Defaults to 0.
 The option tells HTML::Template to cache the values returned from code references
 used for C<TMPL_VAR>s. See L<LAZY VALUES> for details.
 
+=item * cache_lazy_loops
+
+The option tells HTML::Template to cache the values returned from code references
+used for C<TMPL_LOOP>s. See L<LAZY VALUES> for details.
+
 =back
 
 =head3 Filesystem Options
@@ -1060,6 +1065,7 @@ sub new {
         open_mode                   => '',
         utf8                        => 0,
         cache_lazy_vars             => 0,
+        cache_lazy_loops            => 0,
     );
 
     # load in options supplied to new()
@@ -2889,6 +2895,8 @@ sub output {
                         my $loop_values = $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET];
                         if (defined $loop_values && ref $loop_values eq 'CODE') {
                             $loop_values = $loop_values->($self);
+                            $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET] = $loop_values 
+                              if $options->{cache_lazy_loops};
                         }
 
                         # if we have anything for the loop, jump to the next part
@@ -2919,6 +2927,8 @@ sub output {
                             # check to see if the loop is a code ref and if it is execute it to get the values
                             if( ref $loop_values eq 'CODE' ) {
                                 $loop_values = $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET]->($self);
+                                $line->[HTML::Template::COND::VARIABLE][HTML::Template::LOOP::PARAM_SET] = $loop_values
+                                  if $options->{cache_lazy_loops};
                             }
 
                             # if we don't have anything in the loop, jump to the next part
@@ -3228,6 +3238,7 @@ sub output {
         $value_sets_array = $value_sets_array->($template);
         croak("HTML::Template->output: TMPL_LOOP code reference did not return an ARRAY reference!") 
           unless ref $value_sets_array && ref $value_sets_array eq 'ARRAY';
+        $self->[PARAM_SET] = $value_sets_array if $template->{options}->{cache_lazy_loops};
     }
 
     foreach my $value_set (@$value_sets_array) {
