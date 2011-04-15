@@ -1,6 +1,9 @@
 2.10 (in development)
 
-   - Feature: RT #30586 - Added support for open_mode option to allow for
+   - Feature: RT #18901 - Added new utf8 option to make it really simple
+     to use UTF-8 encoded templates [Michael Peters]
+
+   - Feature: RT #30586 - Added new open_mode option to allow for
      Perl IO layers to interact when using open() on the template files
      [moritz@faui2k3.org and Michael Peters]
 

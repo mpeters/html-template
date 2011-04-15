@@ -666,25 +666,48 @@ of paths specified by the path option on every C<< <TMPL_INCLUDE> >> and
 use the first matching template found.  The normal behavior is to look
 only in the current directory for a template to include.  Defaults to 0.
 
+=item * utf8
+
+Setting this to true tells HTML::Template to treat your template files as
+UTF-8 encoded.  This will apply to any file's passed to C<new()> or any
+included files. It won't do anything special to scalars templates passed
+to C<new()> since you should be doing the encoding on those yourself.
+
+    my $template = HTML::Template->new(
+        filename => 'umlauts_are_awesome.tmpl',
+        utf8     => 1,
+    );
+
+Most templates are either ASCII (the default) or UTF-8 encoded
+Unicode. But if you need some other encoding other than these 2, look
+at the C<open_mode> option.
+
+B<NOTE>: The C<utf8> and C<open_mode> options cannot be used at the
+same time.
+
 =item * open_mode
 
 You can set this option to an opening mode with which all template files
 will be opened.
 
-For example, if you want to use a template that is UTF8 encoded unicode:
+For example, if you want to use a template that is UTF-16 encoded unicode:
 
     my $template = HTML::Template->new(
         filename  => 'file.tmpl',
-        open_mode => '<:encoding(utf-8)',
+        open_mode => '<:encoding(UTF-16)',
     );
 
-That way you can force a charset, CR/LF properties etc. on the template
-files. See L<PerlIO> for details.
+That way you can force a different encoding (than the default ASCII
+or UTF-8), CR/LF properties etc. on the template files. See L<PerlIO>
+for details.
 
 B<NOTE>: this only works in perl 5.7.1 and above. 
 
-B<SECOND NOTE>: you have to supply an opening mode that actually permits
+B<NOTE>: you have to supply an opening mode that actually permits
 reading from the file handle.
+
+B<NOTE>: The C<utf8> and C<open_mode> options cannot be used at the
+same time.
 
 =back
 
@@ -1030,6 +1053,7 @@ sub new {
         case_sensitive              => 0,
         filter                      => [],
         open_mode                   => '',
+        utf8                        => 0,
     );
 
     # load in options supplied to new()
@@ -1186,6 +1210,14 @@ sub new {
     # no 3 args form of open before perl 5.7.1
     if ($options->{open_mode} && $] < 5.007001) {
         croak("HTML::Template->new(): open_mode cannot be used in Perl < 5.7.1");
+    }
+
+    if($options->{utf8}) {
+        croak("HTML::Template->new(): utf8 cannot be used in Perl < 5.7.1") if $] < 5.007001;
+        croak("HTML::Template->new(): utf8 and open_mode cannot be used at the same time") if $options->{open_mode};
+
+        # utf8 is just a short-cut for a common open_mode
+        $options->{open_mode} = '<:encoding(utf8)';
     }
 
     print STDERR "### HTML::Template Memory Debug ### POST CACHE INIT ", $self->{proc_mem}->size(), "\n"
