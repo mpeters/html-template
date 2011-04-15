@@ -51,7 +51,6 @@ is($output, chr(228), 'correct UTF8 encoded character from cache');
 # which means it won't be correct UTF8.
 $tmpl = HTML::Template->new(
     filename       => $test_fn,
-    utf8           => 1,
     cache          => 0,
     file_cache     => 1,
     file_cache_dir => $cache_dir,
