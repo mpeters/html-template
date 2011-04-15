@@ -43,7 +43,7 @@
      Dubois and Michael Peters]
 
    - Test Fix: Tests that create and modify files now use temp files
-     and file_cache_dir is always a temp directory.
+     and file_cache_dir is always a temp directory [Michael Peters]
 
    - Doc Fix: Using more POD formatting [Michael Peters]
 
