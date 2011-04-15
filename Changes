@@ -13,6 +13,10 @@
    - Feature: RT #46285 - Added support for lazily-evaluated coderefs
      for TMPL_LOOPs. [Justin DeVuyst and Michael Peters]
 
+   - Feature: RT #64797 - Added new option die_on_missing_include (defaults
+     to true) that allows users to turn off the behavior of dieing when an 
+     include can't be found [Zdenek Styblik and Michael Peters]
+
    - Feature: Add new cache_lazy_vars option so that the values from coderefs
      used for TMPL_VARs can be cached and the coderef not run multiple times 
      [Michael Peters]

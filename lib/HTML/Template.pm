@@ -911,6 +911,11 @@ Set to 10 by default.  Including files to a depth greater than this
 value causes an error message to be displayed.  Set to 0 to disable
 this protection.
 
+=item * die_on_missing_include
+
+If true, then HTML::Template will die if it can't find a file for a
+C<< <TMPL_INCLUDE> >>. This defaults to true.
+
 =item * global_vars
 
 Normally variables declared outside a loop are not available inside
@@ -1100,6 +1105,7 @@ sub new {
         utf8                        => 0,
         cache_lazy_vars             => 0,
         cache_lazy_loops            => 0,
+        die_on_missing_include      => 1,
     );
 
     # load in options supplied to new()
@@ -2451,21 +2457,23 @@ sub _parse {
                     $filepath = $self->_find_file($filename, [File::Spec->splitdir($fstack[-1][0])]);
                 }
                 die "HTML::Template->new() : Cannot open included file $filename : file not found."
-                  unless defined($filepath);
+                  if !defined $filepath  && $options->{die_on_missing_include};
 
-                # use the open_mode if we have one
-                if (my $mode = $options->{open_mode}) {
-                    open(TEMPLATE, $mode, $filepath)
-                      || confess("HTML::Template->new() : Cannot open included file $filepath with mode $mode: $!");
-                } else {
-                    open(TEMPLATE, $filepath)
-                      or confess("HTML::Template->new() : Cannot open included file $filepath : $!");
-                }
-
-                # read into the array
                 my $included_template = "";
-                while (read(TEMPLATE, $included_template, 10240, length($included_template))) { }
-                close(TEMPLATE);
+                if( $filepath ) {
+                    # use the open_mode if we have one
+                    if (my $mode = $options->{open_mode}) {
+                        open(TEMPLATE, $mode, $filepath)
+                          || confess("HTML::Template->new() : Cannot open included file $filepath with mode $mode: $!");
+                    } else {
+                        open(TEMPLATE, $filepath)
+                          or confess("HTML::Template->new() : Cannot open included file $filepath : $!");
+                    }
+
+                    # read into the array
+                    while (read(TEMPLATE, $included_template, 10240, length($included_template))) { }
+                    close(TEMPLATE);
+                }
 
                 # call filters if necessary
                 $self->_call_filters(\$included_template) if @{$options->{filter}};
