@@ -820,27 +820,27 @@ that depend on the loop's context are made available inside a loop. These are:
 
 =item * __first__
 
-Boolean that is true for the first iteration of the loop and false every other time.
+Value that is true for the first iteration of the loop and false every other time.
 
 =item * __last__
 
-Boolean that is true for the last iteration of the loop and false every other time.
+Value that is true for the last iteration of the loop and false every other time.
 
 =item * __inner__
 
-Boolean that is true for the every iteration of the loop except for the first and last.
+Value that is true for the every iteration of the loop except for the first and last.
 
 =item * __outer__
 
-Boolean that is true for the first and last iterations of the loop.
+Value that is true for the first and last iterations of the loop.
 
 =item * __odd__
 
-Boolean that is true for the every odd iteration of the loop.
+Value that is true for the every odd iteration of the loop.
 
 =item * __even__
 
-Boolean that is true for the every event iteration of the loop.
+Value that is true for the every event iteration of the loop.
 
 =item * __counter__
 
@@ -852,8 +852,9 @@ An integer (starting from 0) who's value increments for each iteraction of the l
 
 =back
 
-They can be used just like any other C<TMPL_VAR>s in C<< <TMPL_IF> >>, C<<
-<TMPL_UNLESS> >> and C<< <TMPL_ELSE> >> to control how a loop is output.
+Just like any other C<TMPL_VAR>s these variables can be used in 
+C<< <TMPL_IF> >>, C<< <TMPL_UNLESS> >> and C<< <TMPL_ELSE> >> to control
+how a loop is output.
 
 Example:
 
