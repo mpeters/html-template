@@ -14,7 +14,7 @@ extra tags, the simplest being C<< <TMPL_VAR> >>
 For example, test.tmpl:
 
     <html>
-    <head><title>Test Template</title>
+    <head><title>Test Template</title></head>
     <body>
     My Home Directory is <TMPL_VAR NAME=HOME>
     <p>

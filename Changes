@@ -33,6 +33,8 @@
 
    - Doc Fix: RT #60282 - fix various mispellings [Florian Ernst]
 
+   - Doc Fix: RT #60283 - fix broken HTML example [Florian Ernst]
+
    - Development: Moved development to GitHub
      (https://github.com/mpeters/html-template)
 
