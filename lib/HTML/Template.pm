@@ -834,6 +834,10 @@ Boolean that is true for the every iteration of the loop except for the first an
 
 Boolean that is true for the every odd iteration of the loop.
 
+=item * __even__
+
+Boolean that is true for the every event iteration of the loop.
+
 =item * __counter__
 
 An integer (starting from 1) who's value increments for each iteraction of the loop
@@ -2236,6 +2240,7 @@ sub _parse {
                     $pmap{__inner__}   = HTML::Template::VAR->new();
                     $pmap{__last__}    = HTML::Template::VAR->new();
                     $pmap{__odd__}     = HTML::Template::VAR->new();
+                    $pmap{__even__}    = HTML::Template::VAR->new();
                     $pmap{__counter__} = HTML::Template::VAR->new();
                 }
 
@@ -3271,13 +3276,15 @@ sub output {
             } else {
                 @{$value_set}{qw(__first__ __inner__ __last__)} = (0, 1, 0);
             }
-            $odd = $value_set->{__odd__} = not $odd;
+            $odd = $value_set->{__odd__} = !$odd;
+            $value_set->{__even__} = !$odd;
+            
             $value_set->{__counter__} = $count + 1;
         }
         $template->param($value_set);
         $result .= $template->output;
         $template->clear_params;
-        @{$value_set}{qw(__first__ __last__ __inner__ __odd__ __counter__)} = (0, 0, 0, 0)
+        @{$value_set}{qw(__first__ __last__ __inner__ __odd__ __event__ __counter__)} = (0, 0, 0, 0, 0)
           if ($loop_context_vars);
         $count++;
     }

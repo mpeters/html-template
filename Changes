@@ -21,6 +21,8 @@
      used for TMPL_LOOPs can be cached and the coderef not run multiple times 
      [Michael Peters]
 
+   - Feature: Added __even__ loop context var. [Michael Peters]
+
    - Bug Fix: RT #26456 - force_untaint can't work in Perl < 5.8.0
      [admin@photoresearchers.com]
 
