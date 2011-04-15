@@ -1,5 +1,5 @@
 use strict;
-use Test::More (tests => 24);
+use Test::More (tests => 32);
 use HTML::Template;
 
 my ($output, $template, $result);
@@ -23,6 +23,17 @@ $output = clean($template->output);
 is($output, '1 2 3 4 5', 'sub called multiple times');
 is($count, 5, 'correctly number of increments');
 
+# now with a closure that will increment a variable, but turn cache_lazy_vars on
+my $count = 0;
+$template = HTML::Template->new(path => 'templates', filename => 'escapes.tmpl', cache_lazy_vars => 1);
+$template->param(foo => sub { ++$count });
+$output = clean($template->output);
+is($output, '1 1 1 1 1', 'cache_lazy_vars works');
+is($count, 1, 'correctly number of increments');
+$output = clean($template->output);
+is($output, '1 1 1 1 1', 'cache_lazy_vars works: output() called multiple times');
+is($count, 1, 'correctly number of increments');
+
 # now with closure for a non-existant variable
 $count = 0;
 $template = HTML::Template->new(path => 'templates', filename => 'var.tmpl', die_on_bad_params => 0);
@@ -41,6 +52,22 @@ is($count, 2, 'currect number of increments');
 $template->param(bool => sub { --$count });
 $output = clean($template->output);
 is($output, 'This is a line outside the if. INSIDE the if unless', 'conditional true and then false');
+is($count, 0, 'currect number of decrements');
+
+# now with a closure used in conditionals and vars, but turn cache_lazy_vars on
+$count = 0;
+$template = HTML::Template->new(path => 'templates', filename => 'if.tmpl', cache_lazy_vars => 1);
+$template->param(bool => sub { $count++ });
+$output = clean($template->output);
+is($output, 'This is a line outside the if. unless', 'conditional false w/cache_lazy_vars');
+is($count, 1, 'currect number of increments');
+
+# closure returns false w/conditionals and vars, but turn cache_lazy_vars on
+$count = 1;
+$template = HTML::Template->new(path => 'templates', filename => 'if.tmpl', cache_lazy_vars => 1);
+$template->param(bool => sub { $count-- });
+$output = clean($template->output);
+is($output, 'This is a line outside the if. INSIDE the if', 'conditional true w/cache_lazy_vars');
 is($count, 0, 'currect number of decrements');
 
 # try using a code ref on a TMPL_LOOP

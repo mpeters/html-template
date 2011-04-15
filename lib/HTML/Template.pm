@@ -632,6 +632,11 @@ normal C<cache> mode for the best possible caching.  The file_cache_*
 options that work with file_cache apply to C<double_file_cache> as well.
 Defaults to 0.
 
+=item * cache_lazy_vars
+
+The option tells HTML::Template to cache the values returned from code references
+used for C<TMPL_VAR>s. See L<LAZY VALUES> for details.
+
 =back
 
 =head3 Filesystem Options
@@ -1054,6 +1059,7 @@ sub new {
         filter                      => [],
         open_mode                   => '',
         utf8                        => 0,
+        cache_lazy_vars             => 0,
     );
 
     # load in options supplied to new()
@@ -2841,13 +2847,13 @@ sub output {
             $result .= $$line;
         } elsif ($type eq 'HTML::Template::VAR' and ref($$line) eq 'CODE') {
             if (defined($$line)) {
-                if ($options->{force_untaint}) {
-                    my $tmp = $$line->($self);
-                    croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value") if tainted($tmp);
-                    $result .= $tmp;
-                } else {
-                    $result .= $$line->($self);
-                }
+                my $tmp_val = $$line->($self);
+                croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value") 
+                  if $options->{force_untaint} && tainted($tmp_val);
+                $result .= $tmp_val;
+
+                # change the reference to point to the value now not the code reference
+                $$line = $tmp_val if $options->{cache_lazy_vars}
             }
         } elsif ($type eq 'HTML::Template::VAR') {
             if (defined $$line) {
@@ -2871,8 +2877,9 @@ sub output {
                     if ($line->[HTML::Template::COND::VARIABLE_TYPE] == HTML::Template::COND::VARIABLE_TYPE_VAR) {
                         if (defined ${$line->[HTML::Template::COND::VARIABLE]}) {
                             if (ref(${$line->[HTML::Template::COND::VARIABLE]}) eq 'CODE') {
-                                $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
-                                  if ${$line->[HTML::Template::COND::VARIABLE]}->($self);
+                                my $tmp_val = ${$line->[HTML::Template::COND::VARIABLE]}->($self); 
+                                $x = $line->[HTML::Template::COND::JUMP_ADDRESS] if $tmp_val;
+                                ${$line->[HTML::Template::COND::VARIABLE]} = $tmp_val if $options->{cache_lazy_vars};
                             } else {
                                 $x = $line->[HTML::Template::COND::JUMP_ADDRESS] if ${$line->[HTML::Template::COND::VARIABLE]};
                             }
@@ -2893,8 +2900,9 @@ sub output {
                     if ($line->[HTML::Template::COND::VARIABLE_TYPE] == HTML::Template::COND::VARIABLE_TYPE_VAR) {
                         if (defined ${$line->[HTML::Template::COND::VARIABLE]}) {
                             if (ref(${$line->[HTML::Template::COND::VARIABLE]}) eq 'CODE') {
-                                $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
-                                  unless ${$line->[HTML::Template::COND::VARIABLE]}->($self);
+                                my $tmp_val = ${$line->[HTML::Template::COND::VARIABLE]}->($self);
+                                $x = $line->[HTML::Template::COND::JUMP_ADDRESS] unless $tmp_val;
+                                ${$line->[HTML::Template::COND::VARIABLE]} = $tmp_val if $options->{cache_lazy_vars};
                             } else {
                                 $x = $line->[HTML::Template::COND::JUMP_ADDRESS]
                                   unless ${$line->[HTML::Template::COND::VARIABLE]};
@@ -2943,61 +2951,68 @@ sub output {
         } elsif ($type eq 'HTML::Template::ESCAPE') {
             *line = \$parse_stack[++$x];
             if (defined($$line)) {
+                my $tmp_val;
                 if (ref($$line) eq 'CODE') {
-                    $_ = $$line->($self);
+                    $tmp_val = $$line->($self);
                     if ($options->{force_untaint} > 1 && tainted($_)) {
                         croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
+
+                    $$line = $tmp_val if $options->{cache_lazy_vars};
                 } else {
-                    $_ = $$line;
+                    $tmp_val = $$line;
                     if ($options->{force_untaint} > 1 && tainted($_)) {
                         croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
 
                 # straight from the CGI.pm bible.
-                s/&/&amp;/g;
-                s/\"/&quot;/g;    #"
-                s/>/&gt;/g;
-                s/</&lt;/g;
-                s/'/&#39;/g;      #'
+                $tmp_val =~ s/&/&amp;/g;
+                $tmp_val =~ s/\"/&quot;/g;
+                $tmp_val =~ s/>/&gt;/g;
+                $tmp_val =~ s/</&lt;/g;
+                $tmp_val =~ s/'/&#39;/g; 
 
-                $result .= $_;
+                $result .= $tmp_val;
             }
             next;
         } elsif ($type eq 'HTML::Template::JSESCAPE') {
             $x++;
             *line = \$parse_stack[$x];
             if (defined($$line)) {
+                my $tmp_val;
                 if (ref($$line) eq 'CODE') {
-                    $_ = $$line->($self);
+                    $tmp_val = $$line->($self);
                     if ($options->{force_untaint} > 1 && tainted($_)) {
                         croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
+                    $$line = $tmp_val if $options->{cache_lazy_vars};
                 } else {
-                    $_ = $$line;
+                    $tmp_val = $$line;
                     if ($options->{force_untaint} > 1 && tainted($_)) {
                         croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
-                s/\\/\\\\/g;
-                s/'/\\'/g;
-                s/"/\\"/g;
-                s/\n/\\n/g;
-                s/\r/\\r/g;
-                $result .= $_;
+                $tmp_val =~ s/\\/\\\\/g;
+                $tmp_val =~ s/'/\\'/g;
+                $tmp_val =~ s/"/\\"/g;
+                $tmp_val =~ s/\n/\\n/g;
+                $tmp_val =~ s/\r/\\r/g;
+                $result .= $tmp_val;
             }
         } elsif ($type eq 'HTML::Template::URLESCAPE') {
             $x++;
             *line = \$parse_stack[$x];
             if (defined($$line)) {
+                my $tmp_val;
                 if (ref($$line) eq 'CODE') {
-                    $_ = $$line->($self);
+                    $tmp_val = $$line->($self);
                     if ($options->{force_untaint} > 1 && tainted($_)) {
                         croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
+                    $$line = $tmp_val if $options->{cache_lazy_vars};
                 } else {
-                    $_ = $$line;
+                    $tmp_val = $$line;
                     if ($options->{force_untaint} > 1 && tainted($_)) {
                         croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
@@ -3007,8 +3022,8 @@ sub output {
                     for (0 .. 255) { $URLESCAPE_MAP{chr($_)} = sprintf('%%%02X', $_); }
                 }
                 # do the translation (RFC 2396 ^uric)
-                s!([^a-zA-Z0-9_.\-])!$URLESCAPE_MAP{$1}!g;
-                $result .= $_;
+                $tmp_val =~ s!([^a-zA-Z0-9_.\-])!$URLESCAPE_MAP{$1}!g;
+                $result .= $tmp_val;
             }
         } else {
             confess("HTML::Template::output() : Unknown item in parse_stack : " . $type);

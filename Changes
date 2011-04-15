@@ -13,6 +13,9 @@
    - Feature: RT #46285 - Added support for lazily-evaluated coderefs
      for TMPL_LOOPs. [Justin DeVuyst and Michael Peters]
 
+   - Feature: Add new cache_lazy_vars option so that the values from coderefs
+     used for TMPL_VARs can be cached [Michael Peters]
+
    - Bug Fix: RT #26456 - force_untaint can't work in Perl < 5.8.0
      [admin@photoresearchers.com]
 
