@@ -1,10 +1,13 @@
 use strict;
 use warnings;
 use File::Temp qw(tempdir);
-# no 3 args form of open before perl 5.7.1
-use Test::More ($] < 5.007001 ? (skip_all => 'utf8 needs at least perl 5.7.1') : (tests => 4));
+use Test::More ($] < 5.007001 ? (skip_all => 'utf8 needs at least perl 5.7.1') : (tests => 5));
 
 use_ok('HTML::Template');
+
+# make sure we can't use along with open_mode
+eval { HTML::Template->new(path => 'templates', filename => 'utf8-test.tmpl', utf8 => 1, open_mode => 1)};
+like($@, qr/utf8 and open_mode cannot be used/i, 'cant use uft8 and open_mode at the same time');
 
 my $tmpl = HTML::Template->new(
     path     => 'templates',
