@@ -830,6 +830,10 @@ Boolean that is true for the last iteration of the loop and false every other ti
 
 Boolean that is true for the every iteration of the loop except for the first and last.
 
+=item * __outer__
+
+Boolean that is true for the first and last iterations of the loop.
+
 =item * __odd__
 
 Boolean that is true for the every odd iteration of the loop.
@@ -2238,6 +2242,7 @@ sub _parse {
                 if ($options->{loop_context_vars}) {
                     $pmap{__first__}   = HTML::Template::VAR->new();
                     $pmap{__inner__}   = HTML::Template::VAR->new();
+                    $pmap{__outer__}   = HTML::Template::VAR->new();
                     $pmap{__last__}    = HTML::Template::VAR->new();
                     $pmap{__odd__}     = HTML::Template::VAR->new();
                     $pmap{__even__}    = HTML::Template::VAR->new();
@@ -3270,11 +3275,11 @@ sub output {
     foreach my $value_set (@$value_sets_array) {
         if ($loop_context_vars) {
             if ($count == 0) {
-                @{$value_set}{qw(__first__ __inner__ __last__)} = (1, 0, $#{$value_sets_array} == 0);
+                @{$value_set}{qw(__first__ __inner__ __outer__ __last__)} = (1, 0, 1, $#{$value_sets_array} == 0);
             } elsif ($count == $#{$value_sets_array}) {
-                @{$value_set}{qw(__first__ __inner__ __last__)} = (0, 0, 1);
+                @{$value_set}{qw(__first__ __inner__ __outer__ __last__)} = (0, 0, 1, 1);
             } else {
-                @{$value_set}{qw(__first__ __inner__ __last__)} = (0, 1, 0);
+                @{$value_set}{qw(__first__ __inner__ __outer__ __last__)} = (0, 1, 0, 0);
             }
             $odd = $value_set->{__odd__} = !$odd;
             $value_set->{__even__} = !$odd;
@@ -3284,7 +3289,7 @@ sub output {
         $template->param($value_set);
         $result .= $template->output;
         $template->clear_params;
-        @{$value_set}{qw(__first__ __last__ __inner__ __odd__ __event__ __counter__)} = (0, 0, 0, 0, 0)
+        @{$value_set}{qw(__first__ __last__ __inner__ __outer__ __odd__ __event__ __counter__)} = (0, 0, 0, 0, 0, 0)
           if ($loop_context_vars);
         $count++;
     }
