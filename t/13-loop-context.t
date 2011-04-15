@@ -61,3 +61,10 @@ $template = HTML::Template->new(scalarref => \$tmpl_string, die_on_bad_params =>
 $template->param(foo => \@loop);
 $output = $template->output;
 is($output, 'a:1 b:2 c:3 d:4 e:5 ', '__counter__');
+
+# __index__ 
+$tmpl_string = '<tmpl_loop foo><tmpl_var bar>:<tmpl_var __index__> </tmpl_loop>';
+$template = HTML::Template->new(scalarref => \$tmpl_string, die_on_bad_params => 0, loop_context_vars => 1);
+$template->param(foo => \@loop);
+$output = $template->output;
+is($output, 'a:0 b:1 c:2 d:3 e:4 ', '__index__');

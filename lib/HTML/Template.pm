@@ -846,6 +846,10 @@ Boolean that is true for the every event iteration of the loop.
 
 An integer (starting from 1) who's value increments for each iteraction of the loop
 
+=item * __index__
+
+An integer (starting from 0) who's value increments for each iteraction of the loop
+
 =back
 
 They can be used just like any other C<TMPL_VAR>s in C<< <TMPL_IF> >>, C<<
@@ -2247,6 +2251,7 @@ sub _parse {
                     $pmap{__odd__}     = HTML::Template::VAR->new();
                     $pmap{__even__}    = HTML::Template::VAR->new();
                     $pmap{__counter__} = HTML::Template::VAR->new();
+                    $pmap{__index__}   = HTML::Template::VAR->new();
                 }
 
             } elsif ($which eq '/TMPL_LOOP') {
@@ -3285,11 +3290,12 @@ sub output {
             $value_set->{__even__} = !$odd;
             
             $value_set->{__counter__} = $count + 1;
+            $value_set->{__index__}   = $count;
         }
         $template->param($value_set);
         $result .= $template->output;
         $template->clear_params;
-        @{$value_set}{qw(__first__ __last__ __inner__ __outer__ __odd__ __event__ __counter__)} = (0, 0, 0, 0, 0, 0)
+        @{$value_set}{qw(__first__ __last__ __inner__ __outer__ __odd__ __event__ __counter__ __index__)} = (0, 0, 0, 0, 0, 0, 0)
           if ($loop_context_vars);
         $count++;
     }
