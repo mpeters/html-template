@@ -34,6 +34,13 @@ $template->param(foo => \@loop);
 $output = $template->output;
 is($output, '01110', '__inner__');
 
+# __odd__ 
+$tmpl_string = '<tmpl_loop foo><tmpl_if __odd__>1<tmpl_else>0</tmpl_if></tmpl_loop>';
+$template = HTML::Template->new(scalarref => \$tmpl_string, die_on_bad_params => 0, loop_context_vars => 1);
+$template->param(foo => \@loop);
+$output = $template->output;
+is($output, '10101', '__odd__');
+
 # __counter__ 
 $tmpl_string = '<tmpl_loop foo><tmpl_var bar>:<tmpl_var __counter__> </tmpl_loop>';
 $template = HTML::Template->new(scalarref => \$tmpl_string, die_on_bad_params => 0, loop_context_vars => 1);
