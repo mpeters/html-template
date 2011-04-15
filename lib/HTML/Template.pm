@@ -105,7 +105,7 @@ better.  And it's pretty fast.
 
     <TMPL_VAR NAME="PARAMETER_NAME">
 
-The C<< <TMPL_VAR> > tag is very simple.  For each C<< <TMPL_VAR> >>
+The C<< <TMPL_VAR> >> tag is very simple.  For each C<< <TMPL_VAR> >>
 tag in the template you call:
 
     $template->param(PARAMETER_NAME => "VALUE") 
