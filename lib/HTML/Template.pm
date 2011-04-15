@@ -298,7 +298,7 @@ if available.  As a final attempt, the filename is passed to C<open()>
 directly.  See below for more information on C<HTML_TEMPLATE_ROOT>
 and the C<path> option to C<new()>.
 
-As a protection against infinitly recursive includes, an arbitary
+As a protection against infinitly recursive includes, an arbitrary
 limit of 10 levels deep is imposed.  You can alter this limit with the
 C<max_includes> option.  See the entry for the C<max_includes> option
 below for more details.
@@ -753,8 +753,8 @@ order they appear:
         associate => [$query, $other_obj],
     );
 
-B<NOTE>: The parameter names are matched in a case-insensitve manner.  If
-you have two parameters in a CGI object like 'NAME' and 'Name' one
+B<NOTE>: The parameter names are matched in a case-insensitive manner.
+If you have two parameters in a CGI object like 'NAME' and 'Name' one
 will be chosen randomly by associate.  This behavior can be changed by
 the C<case_sensitive> option.
 
@@ -891,7 +891,7 @@ A filter is a subroutine that will be called after HTML::Template reads
 your template file but before it starts parsing template tags.
 
 In the most simple usage, you simply assign a code reference to the
-filter parameter.  This subroutine will recieve a single argument -
+filter parameter.  This subroutine will receive a single argument -
 a reference to a string containing the template file text.  Here is
 an example that accepts templates with tags that look like 
 C<!!!ZAP_VAR FOO!!!> and transforms them into HTML::Template tags:
@@ -2547,7 +2547,7 @@ C<param()> can be called in a number of ways
     $self->param(PARAM => 'value');
 
     # with a subroutine reference that gets called to get the value
-    # of the scalar.  The sub will recieve the template object as a
+    # of the scalar.  The sub will receive the template object as a
     # parameter.
     $self->param(PARAM => sub { return 'value' });
 

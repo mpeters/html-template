@@ -27,9 +27,11 @@
    - Test Fix: Tests that create and modify files now use temp files
      and file_cache_dir is always a temp directory.
 
-   - Documentation: Using more POD formatting
+   - Doc Fix: Using more POD formatting
 
-   - Documentation: RT #46244 - fix broken link to tutorial [Michael Peters]
+   - Doc Fix: RT #46244 - fix broken link to tutorial [Michael Peters]
+
+   - Doc Fix: RT #60282 - fix various mispellings [Florian Ernst]
 
    - Development: Moved development to GitHub
      (https://github.com/mpeters/html-template)
