@@ -4,3 +4,4 @@
 blib
 .build
 file_cache
+nytprof*
