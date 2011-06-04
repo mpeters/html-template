@@ -4,7 +4,7 @@ $HTML::Template::VERSION = '2.10';
 
 =head1 NAME
 
-HTML::Template - Perl module to use HTML-like templating language
+HTML::Template - Stable, mature, fast and widely-used HTML-like templating language
 
 =head1 SYNOPSIS
 
@@ -22,9 +22,9 @@ For example, test.tmpl:
     </body>
     </html>
 
-Now you can use it in a small CGI program:
+Now you can use it in a tiny web app:
 
-    #!/usr/bin/perl -w
+    #!/usr/bin/perl
     use HTML::Template;
 
     # open the html template
