@@ -1,5 +1,8 @@
 2.10 (in development)
 
+   - Feature: Added 'include_path' option as alias for 'path'. This adds a clarity 
+     is compatible Template::Toolkit's use of the same option.
+
    - Feature: Added new process() method, which separates configuration in new
      from template-specific details and provides auto-detection of the source
      type, as well as improved compatibility with Template::Toolkit. 

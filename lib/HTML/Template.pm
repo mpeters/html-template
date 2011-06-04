@@ -676,7 +676,9 @@ used for C<TMPL_LOOP>s. See L<LAZY VALUES> for details.
 
 =item * path
 
-You can set this variable with a list of paths to search for files
+=item * include_path
+
+You can set the C<path> variable with a list of paths to search for files
 specified with the C<filename> option to C<new()> and for files included
 with the C<< <TMPL_INCLUDE> >> tag.  This list is only consulted when the
 filename is relative.  The C<HTML_TEMPLATE_ROOT> environment variable
@@ -694,6 +696,9 @@ Example:
 
 B<NOTE>: the paths in the path list must be expressed as UNIX paths,
 separated by the forward-slash character ('/').
+
+The alias of C<include_path> is supported for clarity and Template::Toolkit
+compatibility.
 
 =item * search_path_on_include
 
@@ -1136,6 +1141,13 @@ sub new {
 
     # load in options supplied to new()
     $options = _load_supplied_options([@_], $options);
+
+    # Allow include_path as alias for path, but don't allow them to be mixed for simplicity.
+    if ($options->{include_path}) {
+        croak("HTML::Template->new: can't mix 'path' and 'include_path'") if scalar @{ $options->{path} };
+        $options->{path} = $options->{include_path};
+        delete $options->{include_path};
+    }
 
     # blind_cache = 1 implies cache = 1
     $options->{blind_cache} and $options->{cache} = 1;
