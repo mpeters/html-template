@@ -37,11 +37,28 @@ Now you can use it in a small CGI program:
     # send the obligatory Content-Type and print the template output
     print "Content-Type: text/html\n\n", $template->output;
 
-If all is well in the universe this should show something like this in
-your browser when visiting the CGI:
+If all is well in the universe this should print something like this:
 
     My Home Directory is /home/some/directory
     My Path is set to /bin;/usr/bin
+
+Since HTML::Template 3.0, we provide a recommended C<< process() >> method,
+which provides auto-detection of the source type, and a clear separation
+between configuration and template-specific calls. It also provides a degree of
+compatibility with Template::Toolkit. Using it, the above example would look
+like this:
+
+    # open the html template
+    my $template = HTML::Template->new;
+
+    # send the obligatory Content-Type
+    print "Content-Type: text/html\n\n";
+
+    # Load and fill the template in one go.
+    print $template->process('test.tmpl', {
+        HOME => $ENV{HOME},
+        PATH => $ENV{PATH},
+    );
 
 =head1 DESCRIPTION
 
@@ -423,17 +440,26 @@ In order to realize a dramatic savings in bandwidth, the standard
 
 =head2 new
 
-Call C<new()> to create a new Template object:
+Call C<new()> to create a new HTML::Template object:
 
     my $template = HTML::Template->new(
         filename => 'file.tmpl',
         option   => 'value',
     );
 
-You must call C<new()> with at least one C<name => value> pair specifying how
-to access the template text.  You can use C<< filename => 'file.tmpl' >> 
-to specify a filename to be opened as the template.  Alternately you can
-use:
+    # no source defined here... call process() later
+    my $template = HTML::Template->new( option   => 'value' );
+
+Unless you plan to call C<< process >> later, you must call C<new()> with at
+least one C<name => value> pair specifying how to access the template text.
+You may prefer to use the newer C<< process() >> method because it provides
+auto-detection of the template source, so you don't have to remember whether
+the option you need is "file", "file_name" or "file_name". Using C<< process >>
+separates the configuration that happens in new() from template-specific
+details, which helps with re-use.
+
+You can use C<< filename => 'file.tmpl' >> to specify a filename to be opened
+as the template.  Alternately you can use:
 
     my $t = HTML::Template->new(
         scalarref => $ref_to_template_text,
@@ -1188,9 +1214,9 @@ sub new {
     exists($options->{filehandle}) and $source_count++;
     exists($options->{arrayref})   and $source_count++;
     exists($options->{scalarref})  and $source_count++;
-    if ($source_count != 1) {
+    if ($source_count > 1) {
         croak(
-            "HTML::Template->new called with multiple (or no) template sources specified!  A valid call to new() has exactly one filename => 'file' OR exactly one scalarref => \\\$scalar OR exactly one arrayref => \\\@array OR exactly one filehandle => \*FH"
+            "HTML::Template->new called with multiple template sources specified!  A valid call to new() has exactly one filename => 'file' OR exactly one scalarref => \\\$scalar OR exactly one arrayref => \\\@array OR exactly one filehandle => \*FH"
         );
     }
 
@@ -1275,8 +1301,9 @@ sub new {
     print STDERR "### HTML::Template Memory Debug ### POST CACHE INIT ", $self->{proc_mem}->size(), "\n"
       if $options->{memory_debug};
 
-    # initialize data structures
-    $self->_init;
+    # initialize data structures if a template has been provided.
+    # Otherwise, initialization is deferred, so that we can call 'process()' later.
+    $self->_init if ($source_count == 1);
 
     print STDERR "### HTML::Template Memory Debug ### POST _INIT CALL ", $self->{proc_mem}->size(), "\n"
       if $options->{memory_debug};
@@ -2680,6 +2707,10 @@ sub param {
     my $options   = $self->{options};
     my $param_map = $self->{param_map};
 
+    if (not defined $self->{param_map}) {
+        croak('HTML::Template->param() or query() called before new() with template source! You must call new() because knowing a template source in advance is required for param() to work. If you want to defer naming the template source, using new()/process($src,\%params)');
+    }
+
     # the no-parameter case - return list of parameters in the template.
     return keys(%$param_map) unless scalar(@_);
 
@@ -2832,6 +2863,10 @@ sub output {
     my $self    = shift;
     my $options = $self->{options};
     local $_;
+
+    if (not defined $self->{param_map}) {
+        croak('HTML::Template->output() called before new() with template source! You must call new() because knowing a template source in advance is required for param() to work. If you want to defer naming the template source, using new()/process($src,\%params)');
+    }
 
     croak("HTML::Template->output() : You gave me an odd number of parameters to output()!")
       unless ((@_ % 2) == 0);
@@ -3220,6 +3255,66 @@ sub query {
         # this is our loop list, return it.
         return keys(%results);
     }
+}
+
+=head2 process
+
+ my $template = HTML::Template->new(%config);
+
+ $template->process('file.html');
+
+ $template->process('file.html', \%params);
+ $template->process($fh,         \%params);
+ $template->process(\@array,     \%params);
+ $template->process(\$str,       \%params);
+
+This method takes a required template source and optional an optional params
+hash in a single method call. When you use C<< process() >>, you don't provide
+a source in advance to C<< new() >>, and pass one here instead. Unlike C<<
+new() >>, all the template sources are auto-detected: a filehandle, an array
+reference, a scalar reference are all supported, while a string is assumed to
+be a file path.
+
+The handling of the template sources and params is otherwise indentical to how
+they would work when using C<< new() >> or C<< param() >>.
+
+Using C<< process() >> is alternative to calling C<< param() >> and C<< output() >>.
+
+By using process(), there is a clean separation between configuration details
+which rarely change ( and are passed to new() ), and instance-specific details
+including the template name and params, which change on ever call and passed
+here. This allows HTML::Template to more naturally be integrated into
+frameworks, which may initialize HTML::Template to your specifications
+globally, and then allow you to call C<< process() >> locally as needed.
+
+The syntax here is intentionally compatible with Template::Toolkit, although
+Template::Toolkit also supports a third and fourth option which we currently
+ignore.
+
+=cut
+
+sub process {
+    my ($self,$src,$params) = @_;
+
+    croak("HTML::Template->process: source not defined or zero-length") if (not (defined $src && length $src));
+
+    if ( ref $src eq 'SCALAR' ) {
+        $self->{options}{scalarref} = $src;
+    }
+    elsif ( ref $src eq 'ARRAY' ) {
+       $self->{options}{arrayref} = $src;
+    }
+    elsif ( ref $src eq 'GLOB' ) {
+       $self->{options}{filehandle} = $src;
+    }
+    else {
+       $self->{options}{filename} = $src;
+    }
+
+    $self->_init;
+    $self->clear_params();
+    $self->param($params);
+    return $self->output;
 }
 
 # a function that returns the object(s) corresponding to a given path and

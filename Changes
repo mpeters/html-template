@@ -1,5 +1,10 @@
 2.10 (in development)
 
+   - Feature: Added new process() method, which separates configuration in new
+     from template-specific details and provides auto-detection of the source
+     type, as well as improved compatibility with Template::Toolkit. 
+     [Mark Stosberg]
+
    - Feature: RT #18901 - Added new utf8 option to make it really simple
      to use UTF-8 encoded templates [Michael Peters]
 

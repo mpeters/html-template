@@ -5,7 +5,7 @@ use_ok('HTML::Template');
 
 my $tmpl;
 eval { $tmpl = HTML::Template->new() };
-like($@, qr/\QHTML::Template->new called with multiple (or no) template sources specified!/, 'new() with no args dies');
+is($@,'', 'new() with no args survives, so we can call process() later');
 
 eval { $tmpl = HTML::Template->new('file') };
 like($@, qr/\QHTML::Template->new() called with odd number of option parameters/, 'new() with odd number of args dies');
