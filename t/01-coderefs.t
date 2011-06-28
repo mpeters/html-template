@@ -24,7 +24,7 @@ is($output, '1 2 3 4 5', 'sub called multiple times');
 is($count, 5, 'correctly number of increments');
 
 # a coderef that will increment a variable, but turn cache_lazy_vars on
-my $count = 0;
+$count = 0;
 $template = HTML::Template->new(path => 'templates', filename => 'escapes.tmpl', cache_lazy_vars => 1);
 $template->param(foo => sub { ++$count });
 $output = clean($template->output);
