@@ -113,7 +113,7 @@ Numbers, letters, '.', '/', '+', '-' and '_'.
 
 Short answer: you can't. Longer answer: you shouldn't since this violates
 the fundamental concept behind L<HTML::Template> - that design and code
-should be seperate.
+should be separate.
 
 But, inevitably some people still want to do it. If that describes
 you then you should take a look at L<HTML::Template::Expr>. Using

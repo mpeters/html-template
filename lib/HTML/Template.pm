@@ -298,7 +298,7 @@ if available.  As a final attempt, the filename is passed to C<open()>
 directly.  See below for more information on C<HTML_TEMPLATE_ROOT>
 and the C<path> option to C<new()>.
 
-As a protection against infinitly recursive includes, an arbitrary
+As a protection against infinitely recursive includes, an arbitrary
 limit of 10 levels deep is imposed.  You can alter this limit with the
 C<max_includes> option.  See the entry for the C<max_includes> option
 below for more details.
@@ -844,11 +844,11 @@ Value that is true for the every event iteration of the loop.
 
 =item * __counter__
 
-An integer (starting from 1) who's value increments for each iteraction of the loop
+An integer (starting from 1) whose value increments for each iteration of the loop.
 
 =item * __index__
 
-An integer (starting from 0) who's value increments for each iteraction of the loop
+An integer (starting from 0) whose value increments for each iteration of the loop.
 
 =back
 
@@ -980,7 +980,7 @@ C<!!!ZAP_VAR FOO!!!> and transforms them into HTML::Template tags:
     );
 
 More complicated usages are possible.  You can request that your
-filter receieve the template text as an array of lines rather than
+filter receives the template text as an array of lines rather than
 as a single scalar.  To do that you need to specify your filter using
 a hash-ref.  In this form you specify the filter using the C<sub> key
 and the desired argument format using the C<format> key.  The available
@@ -1401,7 +1401,7 @@ sub _init {
     $self->_init_template();
     $self->_parse();
 
-    # now that we have a full init, cache the structures if cacheing is
+    # now that we have a full init, cache the structures if caching is
     # on.  shared cache is already cool.
     if ($options->{file_cache}) {
         $self->_commit_to_file_cache();
@@ -1522,7 +1522,7 @@ sub _get_cache_filename {
     $self->{options}{filepath} = $filepath;
     my $hash = $self->_cache_key();
 
-    # ... and build a path out of it.  Using the first two charcters
+    # ... and build a path out of it.  Using the first two characters
     # gives us 255 buckets.  This means you can have 255,000 templates
     # in the cache before any one directory gets over a few thousand
     # files in it.  That's probably pretty good for this planet.  If not
@@ -1905,7 +1905,7 @@ sub _call_filters {
                     $$template_ref = join("", @array);
                 }
             };
-            croak("HTML::Template->new() : fatal error occured during filter call: $@") if $@;
+            croak("HTML::Template->new() : fatal error occurred during filter call: $@") if $@;
         } else {
             croak("HTML::Template->new() : bad value set for filter parameter - must be code ref or hash ref");
         }
@@ -2222,7 +2222,7 @@ sub _parse {
                     $loop = $pmap{$name};
                     (ref($loop) eq 'HTML::Template::LOOP')
                       or die
-                      "HTML::Template->new() : Already used param name $name as a TMPL_VAR, TMPL_IF or TMPL_UNLESS, found in a TMP_LOOP at $fname : line $fcounter!";
+                      "HTML::Template->new() : Already used param name $name as a TMPL_VAR, TMPL_IF or TMPL_UNLESS, found in a TMPL_LOOP at $fname : line $fcounter!";
 
                 } else {
                     # store the results in a LOOP object - actually just a
@@ -2644,7 +2644,7 @@ C<param()> can be called in a number of ways
     # And TMPL_LOOPs:
     $self->param(LOOP_PARAM => [{PARAM => VALUE_FOR_FIRST_PASS}, {PARAM => VALUE_FOR_SECOND_PASS}]);
 
-=item 4 - To set the value of a a number of parameters :
+=item 4 - To set the value of a number of parameters :
 
     # For simple TMPL_VARs:
     $self->param(
@@ -2812,8 +2812,8 @@ you'll want to print this, like:
 
 When output is called each occurrence of C<< <TMPL_VAR NAME=name> >> is
 replaced with the value assigned to "name" via C<param()>.  If a named
-parameter is unset it is simply replaced with ''.  C<< <TMPL_LOOPS> >>
-are evaluated once per parameter set, accumlating output on each pass.
+parameter is unset it is simply replaced with ''.  C<< <TMPL_LOOP> >>s
+are evaluated once per parameter set, accumulating output on each pass.
 
 Calling C<output()> is guaranteed not to change the state of the
 HTML::Template object, in case you were wondering.  This property is
@@ -2860,7 +2860,7 @@ sub output {
     if (scalar(@{$options->{associate}})) {
         # prepare case-mapping hashes to do case-insensitive matching
         # against associated objects.  This allows CGI.pm to be
-        # case-sensitive and still work with asssociate.
+        # case-sensitive and still work with associate.
         my (%case_map, $lparam);
         foreach my $associated_object (@{$options->{associate}}) {
             # what a hack!  This should really be optimized out for case_sensitive.
@@ -3106,7 +3106,7 @@ simply to check whether a parameter name exists in the template, using
 the C<name> option:
 
     if ($template->query(name => 'foo')) {
-        # do something if a varaible of any type named FOO is in the template
+        # do something if a variable of any type named FOO is in the template
     }
 
 This same usage returns the type of the parameter.  The type is the same
@@ -3240,7 +3240,7 @@ sub _find_param {
     return ($obj, $type) unless @_;
     return unless ($type eq 'HTML::Template::LOOP');
 
-    # recurse.  this is a depth first seach on the template tree, for
+    # recurse.  this is a depth first search on the template tree, for
     # the algorithm geeks in the audience.
     return map { $_->_find_param(@_) } values(%{$obj->[HTML::Template::LOOP::TEMPLATE_HASH]});
 }
