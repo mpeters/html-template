@@ -38,11 +38,7 @@ join the announcements mailing-list here:
 
 Yes, you can find an archive of the SourceForge list here:
 
-    http://www.geocrawler.com/lists/3/SourceForge/23294/0/
-
-For an archive of the old vm.com list, setup by Sean P. Scanlon, see:
-
-    http://bluedot.net/mail/archive/
+    http://dir.gmane.org/gmane.comp.lang.perl.modules.html-template
 
 =head2 I want support for <TMPL_XXX>! How about it?
 
@@ -124,12 +120,6 @@ function. Then you can do awful stuff like:
 
 Just, please, don't tell me about it. I'm feeling guilty enough just
 for writing L<HTML::Template::Expr> in the first place.
-
-=head2 Can I get a copy of these docs in Japanese?
-
-Yes you can. See Kawai Takanori's translation at:
-
-   http://member.nifty.ne.jp/hippo2000/perltips/html/template.htm
 
 =head2 What's the best way to create a <select> form element using HTML::Template?
 
