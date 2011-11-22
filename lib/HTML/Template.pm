@@ -3462,8 +3462,8 @@ including the VERSION of the module, a test script and a test template
 demonstrating the problem!
 
 If you're feeling really adventurous, HTML::Template has a publically
-available Subversion server.  See below for more information in the
-PUBLIC SUBVERSION SERVER section.
+available Git repository.  See below for more information in the
+PUBLIC GIT REPOSITORY section.
 
 =head1 CREDITS
 
@@ -3596,11 +3596,11 @@ You can find information about HTML::Template and other related modules at:
 
    http://html-template.sourceforge.net
 
-=head1 PUBLIC SUBVERSION SERVER
+=head1 PUBLIC GIT REPOSITORY
 
-HTML::Template now has a publicly accessible Subversion server
-provided by SourceForge (www.sourceforge.net).  You can access it by
-going to http://sourceforge.net/svn/?group_id=1075.  Give it a try!
+HTML::Template now has a publicly accessible Git repository
+provided by GitHub (github.com).  You can access it by
+going to https://github.com/mpeters/html-template.  Give it a try!
 
 =head1 AUTHOR
 
