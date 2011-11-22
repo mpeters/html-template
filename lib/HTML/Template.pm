@@ -2659,6 +2659,7 @@ C<param()> can be called in a number of ways
         LOOP_PARAM         => [{PARAM => VALUE_FOR_FIRST_PASS}, {PARAM => VALUE_FOR_SECOND_PASS}],
         ANOTHER_LOOP_PARAM => [{PARAM => VALUE_FOR_FIRST_PASS}, {PARAM => VALUE_FOR_SECOND_PASS}],
     );
+
 =item 5 - To set the value of a a number of parameters using a hash-ref :
 
     $self->param(
@@ -2672,6 +2673,8 @@ C<param()> can be called in a number of ways
 
 An error occurs if you try to set a value that is tainted if the C<force_untaint>
 option is set.
+
+=back
 
 =cut
 
