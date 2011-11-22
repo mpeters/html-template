@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use lib '../lib';
+use Benchmark 'timethese';
 use HTML::Template;
 
 timethese(
