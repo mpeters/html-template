@@ -2889,7 +2889,7 @@ sub output {
     my $result = '';
 
     tie $result, 'HTML::Template::PRINTSCALAR', $args{print_to}
-      if defined $args{print_to} and not tied $args{print_to};
+      if defined $args{print_to} && !eval { tied *{$args{print_to}} };
 
     my $type;
     my $parse_stack_length = $#parse_stack;

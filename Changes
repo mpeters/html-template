@@ -31,6 +31,9 @@
    - Bug Fix: RT #26456 - force_untaint can't work in Perl < 5.8.0
      [admin@photoresearchers.com]
 
+   - Bug Fix: RT #67663 - remove warning under Perl > 5.14.0 about using tied
+     with a file handle without "*" [RENEEB, TODDR and Michael Peters]
+
    - Bug Fix: RT #35534 - Using the same loop multiple times with
      different vars will no longer cause an error if die_on_bad_params 
      is set. [Ron Savage & Michael Peters]
