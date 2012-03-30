@@ -840,7 +840,7 @@ Value that is true for the every odd iteration of the loop.
 
 =item * __even__
 
-Value that is true for the every event iteration of the loop.
+Value that is true for the every even iteration of the loop.
 
 =item * __counter__
 
@@ -3307,7 +3307,7 @@ sub output {
         $template->param($value_set);
         $result .= $template->output;
         $template->clear_params;
-        @{$value_set}{qw(__first__ __last__ __inner__ __outer__ __odd__ __event__ __counter__ __index__)} = (0, 0, 0, 0, 0, 0, 0)
+        @{$value_set}{qw(__first__ __last__ __inner__ __outer__ __odd__ __even__ __counter__ __index__)} = (0, 0, 0, 0, 0, 0, 0)
           if ($loop_context_vars);
         $count++;
     }
