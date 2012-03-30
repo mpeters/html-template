@@ -1,4 +1,4 @@
-2.10 (in development)
+2.91 Fri Mar 30 2012
 
    - Feature: RT #18901 - Added new utf8 option to make it really simple
      to use UTF-8 encoded templates [Michael Peters]
