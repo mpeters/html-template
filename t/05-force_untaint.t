@@ -1,6 +1,7 @@
 #!perl -T
 use Test::More ($] < 5.008000 ? (skip_all => 'force_untaint needs at least perl 5.8.0') : (tests => 4));
 use Scalar::Util qw(tainted);
+use lib 'lib'; # needed for prove in taint mode
 use_ok('HTML::Template');
 
 my $text = qq{ <TMPL_VAR NAME="a"> };
