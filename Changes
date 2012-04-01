@@ -1,3 +1,6 @@
+2.92 (in development)
+    - Bug Fix: t/05-force_untaint.t now passes when run with prove
+
 2.91 Fri Mar 30 2012
 
    - Feature: RT #18901 - Added new utf8 option to make it really simple
