@@ -10,7 +10,8 @@ my $template = HTML::Template->new(
 my @results = sort $template->query();
 is_deeply(\@results, [qw(example_loop var)], 'no args, returns top level items');
 
-is($template->query(name => 'var'),          'VAR',  'name for a variable');
+is($template->query(name => 'var'), 'VAR', 'name for a variable');
+ok(!$template->query(name => 'var2'), 'no name for a non existent var');
 is($template->query(name => 'example_loop'), 'LOOP', 'name for a loop');
 is($template->query(name => ['example_loop', 'bop']), 'VAR', 'name for a var inside a loop');
 is($template->query(name => ['example_loop', 'example_inner_loop']), 'LOOP', 'name for a loop inside a loop');
