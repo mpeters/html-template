@@ -1058,18 +1058,11 @@ sub WHICH_UNLESS ()       { 1 }
 # back to the main package scope.
 package HTML::Template;
 
-# open a new template and return an object handle
-sub new {
-    my $pkg = shift;
-    my $self;
-    { my %hash; $self = bless(\%hash, $pkg); }
+my (%OPTIONS, %DEFAULT_OPTIONS, %LOOP_OPTIONS, %DEFAULT_LOOP_OPTIONS);
 
-    # the options hash
-    my $options = {};
-    $self->{options} = $options;
-
-    # set default parameters in options hash
-    %$options = (
+# set the default options
+BEGIN {
+    %OPTIONS = (
         debug                       => 0,
         stack_debug                 => 0,
         timing                      => 0,
@@ -1107,6 +1100,32 @@ sub new {
         cache_lazy_loops            => 0,
         die_on_missing_include      => 1,
     );
+
+    %LOOP_OPTIONS = (
+        debug             => 0,
+        stack_debug       => 0,
+        die_on_bad_params => 1,
+        associate         => [],
+        loop_context_vars => 0,
+    );
+
+    # defaults in case we need to reset
+    %DEFAULT_OPTIONS = %OPTIONS;
+    %LOOP_OPTIONS    = %LOOP_OPTIONS;
+}
+
+# open a new template and return an object handle
+sub new {
+    my $pkg = shift;
+    my $self;
+    { my %hash; $self = bless(\%hash, $pkg); }
+
+    # the options hash
+    my $options = {};
+    $self->{options} = $options;
+
+    # set default parameters in options hash
+    %$options = %OPTIONS;
 
     # load in options supplied to new()
     $options = _load_supplied_options([@_], $options);
@@ -1308,21 +1327,8 @@ sub _new_from_loop {
     { my %hash; $self = bless(\%hash, $pkg); }
 
     # the options hash
-    my $options = {};
+    my $options = {%LOOP_OPTIONS};
     $self->{options} = $options;
-
-    # set default parameters in options hash - a subset of the options
-    # valid in a normal new().  Since _new_from_loop never calls _init,
-    # many options have no relevance.
-    %$options = (
-        debug             => 0,
-        stack_debug       => 0,
-        die_on_bad_params => 1,
-        associate         => [],
-        loop_context_vars => 0,
-    );
-
-    # load in options supplied to new()
     $options = _load_supplied_options([@_], $options);
 
     $self->{param_map}   = $options->{param_map};
