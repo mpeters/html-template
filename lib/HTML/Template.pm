@@ -1,6 +1,6 @@
 package HTML::Template;
 
-$HTML::Template::VERSION = '2.92';
+$HTML::Template::VERSION = '2.93';
 
 =head1 NAME
 
