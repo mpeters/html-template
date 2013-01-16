@@ -1058,7 +1058,7 @@ sub WHICH_UNLESS ()       { 1 }
 # back to the main package scope.
 package HTML::Template;
 
-my (%OPTIONS, %DEFAULT_OPTIONS, %LOOP_OPTIONS, %DEFAULT_LOOP_OPTIONS);
+my (%OPTIONS, %LOOP_OPTIONS);
 
 # set the default options
 BEGIN {
@@ -1108,10 +1108,6 @@ BEGIN {
         associate         => [],
         loop_context_vars => 0,
     );
-
-    # defaults in case we need to reset
-    %DEFAULT_OPTIONS = %OPTIONS;
-    %LOOP_OPTIONS    = %LOOP_OPTIONS;
 }
 
 # open a new template and return an object handle
@@ -2619,6 +2615,47 @@ sub _unglobalize_vars {
     map   { $_->_unglobalize_vars() }
       map { values %{$_->[HTML::Template::LOOP::TEMPLATE_HASH]} }
       grep { ref($_) eq 'HTML::Template::LOOP' } @{$self->{parse_stack}};
+}
+
+=head2 config
+
+A package method that is used to set/get the global default configuration options.
+For instance, if you want to set the C<utf8> flag to always be on for every
+template loaded by this process you would do:
+
+    HTML::Template->config(utf8 => 1);
+
+Or if you wanted to check if the C<utf8> flag was on or not, you could do:
+
+    my %config = HTML::Template->config;
+    if( $config{utf8} ) {
+        ...
+    }
+
+Any configuration options that are valid for C<new()> are acceptable to be
+passed to this method.
+
+=cut
+
+sub config {
+    my ($pkg, %options) = @_;
+
+    foreach my $opt (keys %options) {
+        if( exists $LOOP_OPTIONS{$opt} ) {
+            if( $opt eq 'associate' || $opt eq 'filter' || $opt eq 'path' ) {
+                push(@{$LOOP_OPTIONS{$opt}}, $options{$opt});
+            } else {
+                $LOOP_OPTIONS{$opt} = $options{$opt};
+            }
+        }
+        if( $opt eq 'associate' || $opt eq 'filter' || $opt eq 'path' ) {
+            push(@{$OPTIONS{$opt}}, $options{$opt});
+        } else {
+            $OPTIONS{$opt} = $options{$opt};
+        }
+    }
+
+    return %OPTIONS;
 }
 
 =head2 param

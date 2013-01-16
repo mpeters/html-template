@@ -1,4 +1,8 @@
 2.92 (in development)
+    - Feature: Added config() method to make setting global defaults
+      easy so that each call to new() has less boiler plate. [Michael
+      Peters]
+
     - Bug Fix: t/05-force_untaint.t now passes when run with prove
       [Michael Peters]
 
