@@ -1,4 +1,4 @@
-2.92 (in development)
+2.92 Wed Jan 16 2013
     - Feature: Added config() method to make setting global defaults
       easy so that each call to new() has less boiler plate. [Michael
       Peters]
