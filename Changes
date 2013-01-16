@@ -1,5 +1,10 @@
 2.92 (in development)
     - Bug Fix: t/05-force_untaint.t now passes when run with prove
+      [Michael Peters]
+
+    - Bug Fix: die_on_bad_params now controls whether we die if tmpl_vars
+      reuse names from tmpl_loops (which can be useful in some situations)
+      [Michael Peters]
 
 2.91 Fri Mar 30 2012
 

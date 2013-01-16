@@ -2173,17 +2173,16 @@ sub _parse {
 
             # take actions depending on which tag found
             if ($which eq 'TMPL_VAR') {
-                $options->{debug}
-                  and print STDERR "### HTML::Template Debug ### $fname : line $fcounter : parsed VAR $name\n";
+                print STDERR "### HTML::Template Debug ### $fname : line $fcounter : parsed VAR $name\n" if $options->{debug};
 
                 # if we already have this var, then simply link to the existing
                 # HTML::Template::VAR, else create a new one.
                 my $var;
                 if (exists $pmap{$name}) {
                     $var = $pmap{$name};
-                    (ref($var) eq 'HTML::Template::VAR')
-                      or die
-                      "HTML::Template->new() : Already used param name $name as a TMPL_LOOP, found in a TMPL_VAR at $fname : line $fcounter.";
+                    if( $options->{die_on_bad_params} && ref($var) ne 'HTML::Template::VAR') {
+                        die "HTML::Template->new() : Already used param name $name as a TMPL_LOOP, found in a TMPL_VAR at $fname : line $fcounter.";
+                    }
                 } else {
                     $var             = HTML::Template::VAR->new();
                     $pmap{$name}     = $var;
@@ -2218,17 +2217,16 @@ sub _parse {
 
             } elsif ($which eq 'TMPL_LOOP') {
                 # we've got a loop start
-                $options->{debug}
-                  and print STDERR "### HTML::Template Debug ### $fname : line $fcounter : LOOP $name start\n";
+                print STDERR "### HTML::Template Debug ### $fname : line $fcounter : LOOP $name start\n" if $options->{debug};
 
                 # if we already have this loop, then simply link to the existing
                 # HTML::Template::LOOP, else create a new one.
                 my $loop;
                 if (exists $pmap{$name}) {
                     $loop = $pmap{$name};
-                    (ref($loop) eq 'HTML::Template::LOOP')
-                      or die
-                      "HTML::Template->new() : Already used param name $name as a TMPL_VAR, TMPL_IF or TMPL_UNLESS, found in a TMPL_LOOP at $fname : line $fcounter!";
+                    if( $options->{die_on_bad_params} && ref($loop) ne 'HTML::Template::LOOP') {
+                        die "HTML::Template->new() : Already used param name $name as a TMPL_VAR, TMPL_IF or TMPL_UNLESS, found in a TMPL_LOOP at $fname : line $fcounter!";
+                    }
 
                 } else {
                     # store the results in a LOOP object - actually just a
