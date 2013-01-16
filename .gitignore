@@ -5,3 +5,5 @@ blib
 .build
 file_cache
 nytprof*
+*.tar.gz
+HTML-Template-*
