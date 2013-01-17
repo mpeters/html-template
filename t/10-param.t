@@ -47,8 +47,8 @@ like($@, qr/a reference to a reference/i, 'trying to use a reference to a refere
 
 # setting multiple values, multiple calls
 $template = HTML::Template->new_scalar_ref(\'<tmpl_var foo> <tmpl_var bar> <tmpl_var baz> <tmpl_loop frob><tmpl_var fooey>-<tmpl_var blah> </tmpl_loop>');
-$template->param(foo => 1, baz => 3);
-$template->param(bar => 2, frob => [{fooey => 'a', blah => 'b'}, {fooey => 'c', blah => 'd'}]);
+$template->param(foo => 1, baz => 2);
+$template->param(bar => 2, baz => 3, frob => [{fooey => 'a', blah => 'b'}, {fooey => 'c', blah => 'd'}]);
 is($template->output, '1 2 3 a-b c-d ', 'can set multiple params at once');
 
 =head1 NAME
