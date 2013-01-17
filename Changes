@@ -1,3 +1,7 @@
+2.94 Thu Jan 17 2013
+    - Fixed bug where options were bleeding over into subsequent calls to new()
+      [Michael Peters]
+
 2.93 Wed Jan 16 2013
     - Feature: Added config() method to make setting global defaults
       easy so that each call to new() has less boiler plate. [Michael

@@ -1058,7 +1058,7 @@ sub WHICH_UNLESS ()       { 1 }
 # back to the main package scope.
 package HTML::Template;
 
-my (%OPTIONS, %LOOP_OPTIONS);
+my %OPTIONS;
 
 # set the default options
 BEGIN {
@@ -1099,14 +1099,6 @@ BEGIN {
         cache_lazy_vars             => 0,
         cache_lazy_loops            => 0,
         die_on_missing_include      => 1,
-    );
-
-    %LOOP_OPTIONS = (
-        debug             => 0,
-        stack_debug       => 0,
-        die_on_bad_params => 1,
-        associate         => [],
-        loop_context_vars => 0,
     );
 }
 
@@ -1323,7 +1315,13 @@ sub _new_from_loop {
     { my %hash; $self = bless(\%hash, $pkg); }
 
     # the options hash
-    my $options = {%LOOP_OPTIONS};
+    my $options = {
+        debug             => $OPTIONS{debug},
+        stack_debug       => $OPTIONS{stack_debug},
+        die_on_bad_params => $OPTIONS{die_on_bad_params},
+        associate         => [@{$OPTIONS{associate}}],
+        loop_context_vars => $OPTIONS{loop_context_vars},
+    };
     $self->{options} = $options;
     $options = _load_supplied_options([@_], $options);
 
@@ -2641,13 +2639,6 @@ sub config {
     my ($pkg, %options) = @_;
 
     foreach my $opt (keys %options) {
-        if( exists $LOOP_OPTIONS{$opt} ) {
-            if( $opt eq 'associate' || $opt eq 'filter' || $opt eq 'path' ) {
-                push(@{$LOOP_OPTIONS{$opt}}, $options{$opt});
-            } else {
-                $LOOP_OPTIONS{$opt} = $options{$opt};
-            }
-        }
         if( $opt eq 'associate' || $opt eq 'filter' || $opt eq 'path' ) {
             push(@{$OPTIONS{$opt}}, $options{$opt});
         } else {
