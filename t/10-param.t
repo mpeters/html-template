@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More (tests => 9);
+use Test::More (tests => 10);
 
 use_ok('HTML::Template');
 
@@ -44,6 +44,12 @@ like($@, qr/You gave me an odd number of parameters to param/, "odd number of ar
 $template = HTML::Template->new_scalar_ref(\'<tmpl_var foo>');
 eval { $template->param(foo => \{}) };
 like($@, qr/a reference to a reference/i, 'trying to use a reference to a reference');
+
+# setting multiple values, multiple calls
+$template = HTML::Template->new_scalar_ref(\'<tmpl_var foo> <tmpl_var bar> <tmpl_var baz> <tmpl_loop frob><tmpl_var fooey>-<tmpl_var blah> </tmpl_loop>');
+$template->param(foo => 1, baz => 3);
+$template->param(bar => 2, frob => [{fooey => 'a', blah => 'b'}, {fooey => 'c', blah => 'd'}]);
+is($template->output, '1 2 3 a-b c-d ', 'can set multiple params at once');
 
 =head1 NAME
 
