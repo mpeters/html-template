@@ -2692,7 +2692,7 @@ C<param()> can be called in a number of ways
         ANOTHER_LOOP_PARAM => [{PARAM => VALUE_FOR_FIRST_PASS}, {PARAM => VALUE_FOR_SECOND_PASS}],
     );
 
-=item 5 - To set the value of a a number of parameters using a hash-ref :
+=item 5 - To set the value of a number of parameters using a hash-ref :
 
     $self->param(
         {
