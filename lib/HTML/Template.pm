@@ -1252,9 +1252,9 @@ sub new {
 
     if ($options->{default_escape}) {
         $options->{default_escape} = uc $options->{default_escape};
-        unless ($options->{default_escape} =~ /^(HTML|URL|JS)$/) {
+        unless ($options->{default_escape} =~ /^(NONE|HTML|URL|JS)$/i) {
             croak(
-                "HTML::Template->new(): Invalid setting for default_escape - '$options->{default_escape}'.  Valid values are HTML, URL or JS."
+                "HTML::Template->new(): Invalid setting for default_escape - '$options->{default_escape}'.  Valid values are 'none', 'html', 'url', or 'js'."
             );
         }
     }
