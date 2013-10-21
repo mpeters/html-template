@@ -1,5 +1,6 @@
 2.95 (in development)
     - Added support for "none" for default_escape [Mark Stosberg]
+    - Escape unicode new-line characters in JS escape [Michael Peters]
 
 2.94 Thu Jan 17 2013
     - Fixed bug where options were bleeding over into subsequent calls to new()

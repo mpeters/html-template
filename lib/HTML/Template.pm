@@ -3086,7 +3086,8 @@ sub output {
                 $tmp_val =~ s/\\/\\\\/g;
                 $tmp_val =~ s/'/\\'/g;
                 $tmp_val =~ s/"/\\"/g;
-                $tmp_val =~ s/\n/\\n/g;
+                $tmp_val =~ s/[\n\x{2028}]/\\n/g;
+                $tmp_val =~ s/\x{2029}/\\n\\n/g;
                 $tmp_val =~ s/\r/\\r/g;
                 $result .= $tmp_val;
             }
