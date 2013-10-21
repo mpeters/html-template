@@ -1,4 +1,4 @@
-2.95 (in development)
+2.95 Mon Oct 21 2013
     - Added support for "none" for default_escape [Mark Stosberg]
     - Escape unicode new-line characters in JS escape [Michael Peters]
 
