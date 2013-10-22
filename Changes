@@ -1,3 +1,6 @@
+2.96 (in development)
+    - Fixed typos in documentation [David Steinbrunner, Steve Kemp]
+
 2.95 Mon Oct 21 2013
     - Added support for "none" for default_escape [Mark Stosberg]
     - Escape unicode new-line characters in JS escape [Michael Peters]
