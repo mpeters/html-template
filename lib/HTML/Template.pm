@@ -126,7 +126,7 @@ The following "attributes" can also be specified in template var tags:
 
 =item * escape
 
-This allows you to escape the value before it's put into the output. Th
+This allows you to escape the value before it's put into the output.
 
 This is useful when you want to use a TMPL_VAR in a context where those characters would
 cause trouble. For example:
