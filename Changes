@@ -3,6 +3,7 @@
     - Added CGI.pm as a dependency, needed now that it's no longer in core.
       [Martin McGrath, Steve Bertrand]
     - Tell PAUSE not to index the inner HTML::Template::* packages
+    - Include a META.json in releases
 
 2.95 Mon Oct 21 2013
     - Added support for "none" for default_escape [Mark Stosberg]
