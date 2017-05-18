@@ -1,3 +1,6 @@
+2.98 In development.
+    - Added Unicode tests [Vytas Dauksa]
+
 2.97 Thu May 18 2017
     - Change internal module name HTML::Template::DEFAULT to
       HTML::Template::DEF to avoid conflict with
