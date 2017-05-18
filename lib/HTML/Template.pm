@@ -1,6 +1,6 @@
 package HTML::Template;
 
-$HTML::Template::VERSION = '2.96';
+$HTML::Template::VERSION = '2.97';
 
 =head1 NAME
 
@@ -2187,7 +2187,7 @@ sub _parse {
                 # if a DEFAULT was provided, push a DEFAULT object on the
                 # stack before the variable.
                 if (defined $default) {
-                    push(@pstack, HTML::Template::DEFAULT->new($default));
+                    push(@pstack, HTML::Template::DEF->new($default));
                 }
 
                 # if ESCAPE was set, push an ESCAPE op on the stack before
@@ -3021,7 +3021,7 @@ sub output {
             }
         } elsif ($type eq 'HTML::Template::NOOP') {
             next;
-        } elsif ($type eq 'HTML::Template::DEFAULT') {
+        } elsif ($type eq 'HTML::Template::DEF') {
             $_ = $x;    # remember default place in stack
 
             # find next VAR, there might be an ESCAPE in the way
@@ -3289,7 +3289,7 @@ sub new {
     return bless(\$value, $_[0]);
 }
 
-package HTML::Template::DEFAULT;
+package HTML::Template::DEF;
 
 sub new {
     my $value = $_[1];
