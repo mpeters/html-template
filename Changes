@@ -1,5 +1,6 @@
 2.98 In development.
     - Added Unicode tests [Vytas Dauksa]
+    - Added [MetaJSON] to dist.ini so releases will include a META.json file
 
 2.97 Thu May 18 2017
     - Change internal module name HTML::Template::DEFAULT to
