@@ -35,27 +35,27 @@ __DATA__
 <!-- TMPL_VAR NAME="foo" -->|<b>this is bold\n|&lt;b&gt;this is bold\n
 
 # use js escaping
-<TMPL_VAR foo ESCAPE=JS>|<b>this is bold\n|<b>this is bold\\n
-<TMPL_VAR ESCAPE=JS foo>|<b>this is bold\n|<b>this is bold\\n
-<TMPL_VAR ESCAPE="JS" foo>|<b>this is bold\n|<b>this is bold\\n
-<TMPL_VAR foo ESCAPE="JS">|<b>this is bold\n|<b>this is bold\\n
-<TMPL_VAR NAME="foo" ESCAPE="JS">|<b>this is bold\n|<b>this is bold\\n
-<TMPL_VAR ESCAPE="JS" NAME="foo">|<b>this is bold\n|<b>this is bold\\n
-<TMPL_VAR ESCAPE='JS' foo>|<b>this is bold\n|<b>this is bold\\n
-<TMPL_VAR foo ESCAPE='JS'>|<b>this is bold\n|<b>this is bold\\n
-<TMPL_VAR NAME='foo' ESCAPE='JS'>|<b>this is bold\n|<b>this is bold\\n
-<TMPL_VAR ESCAPE='JS' NAME='foo'>|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR foo ESCAPE=JS -->|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR ESCAPE=JS foo -->|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR foo ESCAPE=JS -->|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR ESCAPE="JS" foo -->|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR foo ESCAPE="JS" -->|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR NAME="foo" ESCAPE="JS" -->|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR ESCAPE="JS" NAME="foo" -->|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR ESCAPE='JS' foo -->|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR foo ESCAPE='JS' -->|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR NAME='foo' ESCAPE='JS' -->|<b>this is bold\n|<b>this is bold\\n
-<!-- TMPL_VAR ESCAPE='JS' NAME='foo' -->|<b>this is bold\n|<b>this is bold\\n
+<TMPL_VAR foo ESCAPE=JS>|<b>this is bold\n|\u003cb>this is bold\\n
+<TMPL_VAR ESCAPE=JS foo>|<b>this is bold\n|\u003cb>this is bold\\n
+<TMPL_VAR ESCAPE="JS" foo>|<b>this is bold\n|\u003cb>this is bold\\n
+<TMPL_VAR foo ESCAPE="JS">|<b>this is bold\n|\u003cb>this is bold\\n
+<TMPL_VAR NAME="foo" ESCAPE="JS">|<b>this is bold\n|\u003cb>this is bold\\n
+<TMPL_VAR ESCAPE="JS" NAME="foo">|<b>this is bold\n|\u003cb>this is bold\\n
+<TMPL_VAR ESCAPE='JS' foo>|<b>this is bold\n|\u003cb>this is bold\\n
+<TMPL_VAR foo ESCAPE='JS'>|<b>this is bold\n|\u003cb>this is bold\\n
+<TMPL_VAR NAME='foo' ESCAPE='JS'>|<b>this is bold\n|\u003cb>this is bold\\n
+<TMPL_VAR ESCAPE='JS' NAME='foo'>|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR foo ESCAPE=JS -->|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR ESCAPE=JS foo -->|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR foo ESCAPE=JS -->|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR ESCAPE="JS" foo -->|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR foo ESCAPE="JS" -->|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR NAME="foo" ESCAPE="JS" -->|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR ESCAPE="JS" NAME="foo" -->|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR ESCAPE='JS' foo -->|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR foo ESCAPE='JS' -->|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR NAME='foo' ESCAPE='JS' -->|<b>this is bold\n|\u003cb>this is bold\\n
+<!-- TMPL_VAR ESCAPE='JS' NAME='foo' -->|<b>this is bold\n|\u003cb>this is bold\\n
 
 #use url escaping
 <TMPL_VAR foo ESCAPE=URL>|<b>this is bold\n|%3Cb%3Ethis%20is%20bold%5Cn

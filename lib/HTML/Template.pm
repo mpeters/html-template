@@ -153,8 +153,20 @@ C<&>, C<">, C<'>, C<< < >>, C<< > >>
 
 =item * js
 
-Escapes (with a backslash) the following characters: C<\>, C<'>, C<">,
-C<\n>, C<\r>
+Escapes text for use inside a JavaScript string literal (single or double
+quoted), including when that string appears inside an HTML C<< <script> >>
+block. Escapes C<\>, C<'>, C<">, C</>, C<\n>, C<\r>, C<\b>, C<\f>, C<\t>,
+turns C<< < >> into C<\u003c> (to neutralize C<< </script> >> breakouts),
+and escapes U+2028 / U+2029.
+
+=item * json
+
+Escapes a JSON text so it can be embedded as a raw JavaScript expression
+inside HTML (for example C<< <script>init(<TMPL_VAR data ESCAPE=JSON>)</script> >>).
+Currently turns C<< < >> into C<\u003c> so a C<< </script> >> sequence in a
+JSON string cannot close the HTML script element. Prefer embedding JSON as a
+raw expression (C<< var x = <TMPL_VAR data ESCAPE=JSON>; >>) rather than
+inside a quoted JavaScript string.
 
 =item * url
 
@@ -1259,9 +1271,9 @@ sub new {
 
     if ($options->{default_escape}) {
         $options->{default_escape} = uc $options->{default_escape};
-        unless ($options->{default_escape} =~ /^(NONE|HTML|URL|JS)$/i) {
+        unless ($options->{default_escape} =~ /^(NONE|HTML|URL|JS|JSON)$/i) {
             croak(
-                "HTML::Template->new(): Invalid setting for default_escape - '$options->{default_escape}'.  Valid values are 'none', 'html', 'url', or 'js'."
+                "HTML::Template->new(): Invalid setting for default_escape - '$options->{default_escape}'.  Valid values are 'none', 'html', 'url', 'js', or 'json'."
             );
         }
     }
@@ -1975,10 +1987,11 @@ sub _parse {
     my @fstack = ([$options->{filepath} || "/fake/path/for/non/file/template", 1, scalar @{[$self->{template} =~ m/(\n)/g]} + 1]);
     (*fname, *fcounter, *fmax) = \(@{$fstack[0]});
 
-    my $NOOP      = HTML::Template::NOOP->new();
-    my $ESCAPE    = HTML::Template::ESCAPE->new();
-    my $JSESCAPE  = HTML::Template::JSESCAPE->new();
-    my $URLESCAPE = HTML::Template::URLESCAPE->new();
+    my $NOOP       = HTML::Template::NOOP->new();
+    my $ESCAPE     = HTML::Template::ESCAPE->new();
+    my $JSESCAPE   = HTML::Template::JSESCAPE->new();
+    my $JSONESCAPE = HTML::Template::JSONESCAPE->new();
+    my $URLESCAPE  = HTML::Template::URLESCAPE->new();
 
     # all the tags that need NAMEs:
     my %need_names = map { $_ => 1 } qw(TMPL_VAR TMPL_LOOP TMPL_IF TMPL_UNLESS TMPL_INCLUDE);
@@ -2037,6 +2050,7 @@ sub _parse {
                            (?:["']?html["']?) |
                            (?:["']?url["']?) |
                            (?:["']?js["']?) |
+                           (?:["']?json["']?) |
                            (?:["']?none["']?)
                          )                         # $5 => ESCAPE on
                        )
@@ -2093,6 +2107,7 @@ sub _parse {
                            (?:["']?html["']?) |
                            (?:["']?url["']?) |
                            (?:["']?js["']?) |
+                           (?:["']?json["']?) |
                            (?:["']?none["']?)
                          )                         # $15 => ESCAPE on
                        )
@@ -2196,6 +2211,8 @@ sub _parse {
                 if ($escape) {
                     if ($escape =~ /^["']?url["']?$/i) {
                         push(@pstack, $URLESCAPE);
+                    } elsif ($escape =~ /^["']?json["']?$/i) {
+                        push(@pstack, $JSONESCAPE);
                     } elsif ($escape =~ /^["']?js["']?$/i) {
                         push(@pstack, $JSESCAPE);
                     } elsif ($escape =~ /^["']?0["']?$/) {
@@ -3029,6 +3046,7 @@ sub output {
             *line = \$parse_stack[++$x]
               if ref $line eq 'HTML::Template::ESCAPE'
                   or ref $line eq 'HTML::Template::JSESCAPE'
+                  or ref $line eq 'HTML::Template::JSONESCAPE'
                   or ref $line eq 'HTML::Template::URLESCAPE';
 
             # either output the default or go back
@@ -3083,12 +3101,40 @@ sub output {
                         croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
+                # Escape for JS string literals, including inside <script>.
                 $tmp_val =~ s/\\/\\\\/g;
                 $tmp_val =~ s/'/\\'/g;
                 $tmp_val =~ s/"/\\"/g;
-                $tmp_val =~ s/[\n\x{2028}]/\\n/g;
-                $tmp_val =~ s/\x{2029}/\\n\\n/g;
+                $tmp_val =~ s/\//\\\//g;
+                $tmp_val =~ s/\n/\\n/g;
                 $tmp_val =~ s/\r/\\r/g;
+                $tmp_val =~ s/\x08/\\b/g;
+                $tmp_val =~ s/\f/\\f/g;
+                $tmp_val =~ s/\t/\\t/g;
+                $tmp_val =~ s/</\\u003c/g;
+                $tmp_val =~ s/\x{2028}/\\u2028/g;
+                $tmp_val =~ s/\x{2029}/\\u2029/g;
+                $result .= $tmp_val;
+            }
+        } elsif ($type eq 'HTML::Template::JSONESCAPE') {
+            $x++;
+            *line = \$parse_stack[$x];
+            if (defined($$line)) {
+                my $tmp_val;
+                if (ref($$line) eq 'CODE') {
+                    $tmp_val = $$line->($self);
+                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                        croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
+                    }
+                    $$line = $tmp_val if $options->{cache_lazy_vars};
+                } else {
+                    $tmp_val = $$line;
+                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                        croak("HTML::Template->output() : tainted value with 'force_untaint' option");
+                    }
+                }
+                # Safe raw JSON as a JS expression inside HTML <script>.
+                $tmp_val =~ s/</\\u003c/g;
                 $result .= $tmp_val;
             }
         } elsif ($type eq 'HTML::Template::URLESCAPE') {
@@ -3379,6 +3425,15 @@ sub new {
 }
 
 package HTML::Template::JSESCAPE;
+
+sub new {
+    my $unused;
+    my $self = \$unused;
+    bless($self, $_[0]);
+    return $self;
+}
+
+package HTML::Template::JSONESCAPE;
 
 sub new {
     my $unused;

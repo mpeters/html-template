@@ -1,4 +1,12 @@
 2.98 In development.
+    - Strengthened ESCAPE=JS for safe use inside HTML <script> string
+      literals: also escape /, < as \u003c, and common control characters.
+      This is a deliberate behavior change to neutralize </script> breakouts.
+      [Frederic Shao / Bacula Systems]
+    - Added ESCAPE=JSON for embedding JSON as a raw JavaScript expression
+      in HTML (rewrites < to \u003c). Prefer `var x = <TMPL_VAR data ESCAPE=JSON>;`
+      over quoting JSON inside a JS string.
+      [Frederic Shao / Bacula Systems]
     - Added Unicode tests [Vytas Dauksa]
 
 2.97 Thu May 18 2017

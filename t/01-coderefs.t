@@ -14,7 +14,7 @@ is($output, 'bar', 'correct value returned');
 $template = HTML::Template->new(path => 'templates', filename => 'escapes.tmpl');
 $template->param(foo => sub { '<bar "foo">' });
 $output = clean($template->output);
-is($output, '<bar "foo"> <bar "foo"> &lt;bar &quot;foo&quot;&gt; <bar \"foo\"> %3Cbar%20%22foo%22%3E', 'correct value escaped');
+is($output, '<bar "foo"> <bar "foo"> &lt;bar &quot;foo&quot;&gt; \u003cbar \"foo\"> %3Cbar%20%22foo%22%3E', 'correct value escaped');
 
 # a coderef that will increment a variable
 my $count = 0;
