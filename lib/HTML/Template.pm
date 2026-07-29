@@ -164,7 +164,8 @@ and escapes U+2028 / U+2029.
 Escapes a JSON text so it can be embedded as a raw JavaScript expression
 inside HTML (for example C<< <script>init(<TMPL_VAR data ESCAPE=JSON>)</script> >>).
 Currently turns C<< < >> into C<\u003c> so a C<< </script> >> sequence in a
-JSON string cannot close the HTML script element. Prefer embedding JSON as a
+JSON string cannot close the HTML script element, and escapes U+2028/U+2029
+which are valid in JSON but were line terminators in pre-ES2019 JavaScript. Prefer embedding JSON as a
 raw expression (C<< var x = <TMPL_VAR data ESCAPE=JSON>; >>) rather than
 inside a quoted JavaScript string.
 
@@ -3135,6 +3136,8 @@ sub output {
                 }
                 # Safe raw JSON as a JS expression inside HTML <script>.
                 $tmp_val =~ s/</\\u003c/g;
+                $tmp_val =~ s/\x{2028}/\\u2028/g;
+                $tmp_val =~ s/\x{2029}/\\u2029/g;
                 $result .= $tmp_val;
             }
         } elsif ($type eq 'HTML::Template::URLESCAPE') {
