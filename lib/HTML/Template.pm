@@ -3160,6 +3160,12 @@ sub output {
     print STDERR "### HTML::Template Memory Debug ### END OUTPUT ", $self->{proc_mem}->size(), "\n"
       if $options->{memory_debug};
 
+    # if print_to's handle was itself tied we skipped tying $result and
+    # accumulated the output instead - deliver it now rather than
+    # silently discarding it
+    print {$args{print_to}} $result
+      if defined $args{print_to} && !tied $result;
+
     return undef if defined $args{print_to};
     return $result;
 }
