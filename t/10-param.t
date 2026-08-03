@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More (tests => 10);
+use Test::More (tests => 11);
 
 use_ok('HTML::Template');
 
@@ -50,6 +50,20 @@ $template = HTML::Template->new_scalar_ref(\'<tmpl_var foo> <tmpl_var bar> <tmpl
 $template->param(foo => 1, baz => 2);
 $template->param(bar => 2, baz => 3, frob => [{fooey => 'a', blah => 'b'}, {fooey => 'c', blah => 'd'}]);
 is($template->output, '1 2 3 a-b c-d ', 'can set multiple params at once');
+
+# an array-like object whose class name happens to contain "HASH" must
+# still be accepted as loop data (regression: the old type-check regex
+# was /^(CODE)|(HASH)|(SCALAR)$/, which anchors only the first and last
+# alternatives, so "HASH" matched anywhere in the class name)
+{
+
+    package My::HASHish;
+    sub new { return bless [{v => 'row1'}], shift }
+    sub isa { my ($self, $what) = @_; return $what eq 'ARRAY' ? 1 : 0 }
+}
+$template = HTML::Template->new_scalar_ref(\'<tmpl_loop l><tmpl_var v></tmpl_loop>');
+$template->param(l => My::HASHish->new);
+is($template->output, 'row1', 'array-like object with HASH in its class name works as loop data');
 
 =head1 NAME
 
