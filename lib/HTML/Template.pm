@@ -2613,8 +2613,15 @@ sub _parse {
 sub _globalize_vars {
     my $self = shift;
 
+    # remember how many associate objects were already present so that
+    # _unglobalize_vars can restore the list to exactly this state
+    # instead of destroying it - the top-level list holds the
+    # user-supplied associate objects!
+    my $associate = $self->{options}{associate} ||= [];
+    $self->{pre_globalize_associate_count} = scalar @$associate;
+
     # associate with the loop (and top-level templates) above in the tree.
-    push(@{$self->{options}{associate}}, @_);
+    push(@$associate, @_);
 
     # recurse down into the template tree, adding ourself to the end of
     # list.
@@ -2628,8 +2635,12 @@ sub _globalize_vars {
 sub _unglobalize_vars {
     my $self = shift;
 
-    # disassociate
-    $self->{options}{associate} = undef;
+    # drop only the parent templates appended by _globalize_vars - this
+    # breaks the circular references while keeping any user-supplied
+    # associate objects
+    my $count = delete $self->{pre_globalize_associate_count};
+    splice(@{$self->{options}{associate}}, $count)
+      if defined $count;
 
     # recurse down into the template tree disassociating
     map   { $_->_unglobalize_vars() }
