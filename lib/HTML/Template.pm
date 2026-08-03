@@ -160,6 +160,12 @@ C<\n>, C<\r>
 
 URL escapes any ASCII characters except for letters, numbers, C<_>, C<.> and C<->.
 
+Values containing characters above C<0xFF> (which have no single-byte
+representation) are UTF-8 encoded before percent-escaping - the
+Chinese character U+5B57, for example, produces C<%E5%AD%97>.  All
+other values - byte strings and single-byte-range text - keep their
+historical byte-wise escapes (n-tilde, U+00F1, stays C<%F1>).
+
 =item * none 
 
 Performs no escaping. This is the default, but it's useful to be able to explicitly
