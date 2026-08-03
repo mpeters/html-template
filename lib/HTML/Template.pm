@@ -3077,14 +3077,14 @@ sub output {
                 my $tmp_val;
                 if (ref($$line) eq 'CODE') {
                     $tmp_val = $$line->($self);
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
 
                     $$line = $tmp_val if $options->{cache_lazy_vars};
                 } else {
                     $tmp_val = $$line;
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
@@ -3106,13 +3106,13 @@ sub output {
                 my $tmp_val;
                 if (ref($$line) eq 'CODE') {
                     $tmp_val = $$line->($self);
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
                     $$line = $tmp_val if $options->{cache_lazy_vars};
                 } else {
                     $tmp_val = $$line;
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
@@ -3131,13 +3131,13 @@ sub output {
                 my $tmp_val;
                 if (ref($$line) eq 'CODE') {
                     $tmp_val = $$line->($self);
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
                     $$line = $tmp_val if $options->{cache_lazy_vars};
                 } else {
                     $tmp_val = $$line;
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
