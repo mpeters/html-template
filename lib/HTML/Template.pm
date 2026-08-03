@@ -3355,8 +3355,19 @@ sub output {
         $self->[PARAM_SET] = $value_sets_array if $template->{options}->{cache_lazy_loops};
     }
 
+    my @context_vars = qw(__first__ __last__ __inner__ __outer__ __odd__ __even__ __counter__ __index__);
+
     foreach my $value_set (@$value_sets_array) {
+        my %saved_context;
         if ($loop_context_vars) {
+            # remember any pre-existing values for the context keys -
+            # output() is documented not to change state, and that
+            # includes the caller's loop data
+            foreach my $var (@context_vars) {
+                $saved_context{$var} = $value_set->{$var}
+                  if exists $value_set->{$var};
+            }
+
             if ($count == 0) {
                 @{$value_set}{qw(__first__ __inner__ __outer__ __last__)} = (1, 0, 1, $#{$value_sets_array} == 0);
             } elsif ($count == $#{$value_sets_array}) {
@@ -3366,15 +3377,18 @@ sub output {
             }
             $odd = $value_set->{__odd__} = !$odd;
             $value_set->{__even__} = !$odd;
-            
+
             $value_set->{__counter__} = $count + 1;
             $value_set->{__index__}   = $count;
         }
         $template->param($value_set);
         $result .= $template->output;
         $template->clear_params;
-        @{$value_set}{qw(__first__ __last__ __inner__ __outer__ __odd__ __even__ __counter__ __index__)} = (0, 0, 0, 0, 0, 0, 0)
-          if ($loop_context_vars);
+        if ($loop_context_vars) {
+            # put the caller's hash back exactly as we found it
+            delete @{$value_set}{@context_vars};
+            $value_set->{$_} = $saved_context{$_} for keys %saved_context;
+        }
         $count++;
     }
 
