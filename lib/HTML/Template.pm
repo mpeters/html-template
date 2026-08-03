@@ -1633,12 +1633,17 @@ sub _commit_to_file_cache {
 
     my ($cache_dir, $cache_file) = $self->_get_cache_filename($filepath);
     $cache_dir = File::Spec->join($options->{file_cache_dir}, $cache_dir);
+    # the -d/mkdir pairs tolerate another process creating the
+    # directory between the check and the call - under concurrent
+    # load losing that race is normal, not an error
     if (not -d $cache_dir) {
         if (not -d $options->{file_cache_dir}) {
             mkdir($options->{file_cache_dir}, $options->{file_cache_dir_mode})
+              or -d $options->{file_cache_dir}
               or croak("HTML::Template->new() : can't mkdir $options->{file_cache_dir} (file_cache => 1): $!");
         }
         mkdir($cache_dir, $options->{file_cache_dir_mode})
+          or -d $cache_dir
           or croak("HTML::Template->new() : can't mkdir $cache_dir (file_cache => 1): $!");
     }
 
