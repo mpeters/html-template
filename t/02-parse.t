@@ -53,14 +53,14 @@ is($output, 'a:a', 'both var forms worked');
     my $file = 'four.tmpl';    # non-existent file
     local $ENV{HTML_TEMPLATE_ROOT} = "templates";
     eval { HTML::Template->new(path => ['searchpath'], filename => $file) };
-    like($@, qr/Cannot open included file $file/, "Template file not found");
+    like($@, qr/Cannot open template file $file/, "Template file not found");
 }
 
 {
     my $file = 'four.tmpl';    # non-existent file
     local $ENV{HTML_TEMPLATE_ROOT} = "templates";
     eval { HTML::Template->new(filename => $file); };
-    like($@, qr/Cannot open included file $file/, "Template file not found");
+    like($@, qr/Cannot open template file $file/, "Template file not found");
 }
 
 {

@@ -62,9 +62,22 @@ $template->param(foo => \@loop);
 $output = $template->output;
 is($output, 'a:1 b:2 c:3 d:4 e:5 ', '__counter__');
 
-# __index__ 
+# __index__
 $tmpl_string = '<tmpl_loop foo><tmpl_var bar>:<tmpl_var __index__> </tmpl_loop>';
 $template = HTML::Template->new(scalarref => \$tmpl_string, die_on_bad_params => 0, loop_context_vars => 1);
 $template->param(foo => \@loop);
 $output = $template->output;
 is($output, 'a:0 b:1 c:2 d:3 e:4 ', '__index__');
+
+# output() must not modify the caller's loop data - the context vars
+# used to be left behind (all zero, plus __index__ => undef) in the
+# row hashes after output
+my @rows = ({bar => 'a'}, {bar => 'b', __first__ => 'sentinel'});
+my @copy = ({bar => 'a'}, {bar => 'b', __first__ => 'sentinel'});
+$tmpl_string = '<tmpl_loop foo><tmpl_var bar>:<tmpl_var __counter__> </tmpl_loop>';
+$template = HTML::Template->new(scalarref => \$tmpl_string, die_on_bad_params => 0, loop_context_vars => 1);
+$template->param(foo => \@rows);
+$output = $template->output;
+is($output, 'a:1 b:2 ', 'loop with pre-existing context key still outputs correctly');
+$template->output;    # restore must also be idempotent across calls
+is_deeply(\@rows, \@copy, 'caller loop data unchanged by output(), pre-existing keys restored');

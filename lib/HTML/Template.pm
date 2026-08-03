@@ -160,6 +160,12 @@ C<\n>, C<\r>
 
 URL escapes any ASCII characters except for letters, numbers, C<_>, C<.> and C<->.
 
+Values containing characters above C<0xFF> (which have no single-byte
+representation) are UTF-8 encoded before percent-escaping - the
+Chinese character U+5B57, for example, produces C<%E5%AD%97>.  All
+other values - byte strings and single-byte-range text - keep their
+historical byte-wise escapes (n-tilde, U+00F1, stays C<%F1>).
+
 =item * none 
 
 Performs no escaping. This is the default, but it's useful to be able to explicitly
@@ -1017,6 +1023,14 @@ specified.
 The specified filters will be called for any C<TMPL_INCLUDE>ed files just
 as they are for the main template file.
 
+B<NOTE>: since filters are code references they cannot be hashed into
+the cache key used by the caching options.  Only the I<number> of
+filters is included in the key.  If you share a cache between templates
+that use the same file with I<different> filter code (and the same
+number of filters), they will collide in the cache and you may get
+stale results.  Vary another keyed option (for example C<path>) if you
+need to keep them apart.
+
 =item * default_escape
 
 Set this parameter to a valid escape type (see the C<escape> option)
@@ -1275,8 +1289,10 @@ sub new {
         croak("HTML::Template->new(): utf8 cannot be used in Perl < 5.7.1") if $] < 5.007001;
         croak("HTML::Template->new(): utf8 and open_mode cannot be used at the same time") if $options->{open_mode};
 
-        # utf8 is just a short-cut for a common open_mode
-        $options->{open_mode} = '<:encoding(utf8)';
+        # utf8 is just a short-cut for a common open_mode.  Note the
+        # strict "UTF-8" spelling: the lax "utf8" layer admits
+        # ill-formed sequences (e.g. surrogates) into the document.
+        $options->{open_mode} = '<:encoding(UTF-8)';
     }
 
     print STDERR "### HTML::Template Memory Debug ### POST CACHE INIT ", $self->{proc_mem}->size(), "\n"
@@ -1496,10 +1512,14 @@ sub _commit_to_cache {
 
 # create a cache key from a template object.  The cache key includes
 # the full path to the template and options which affect template
-# loading.
+# loading.  The key is memoized on the object - _parse() deletes the
+# filter option when it finishes, so recomputing after a parse would
+# produce a different key than the one used to check the cache.
 sub _cache_key {
     my $self    = shift;
     my $options = $self->{options};
+
+    return $self->{cache_key} if defined $self->{cache_key};
 
     # assemble pieces of the key
     my @key = ($options->{filepath});
@@ -1510,8 +1530,26 @@ sub _cache_key {
     push(@key, $options->{global_vars}            || 0);
     push(@key, $options->{open_mode}              || 0);
 
+    # these also change the compiled parse_stack/param_map, so
+    # templates differing only in them must not share a cache slot.
+    # filters are coderefs so only their count can participate - see
+    # the note in the filter documentation.
+    push(@key, $options->{case_sensitive}              || 0);
+    push(@key, $options->{default_escape}              || '');
+    push(@key, $options->{vanguard_compatibility_mode} || 0);
+    push(@key, $options->{die_on_bad_params}           || 0);
+    push(@key, scalar @{$options->{filter} || []});
+
+    # ... and these change whether parsing is allowed to succeed at
+    # all.  A cache hit skips _parse(), so it must never skip _parse's
+    # policy checks - e.g. no_includes refusing TMPL_INCLUDE.
+    push(@key, $options->{no_includes}            || 0);
+    push(@key, $options->{strict}                 || 0);
+    push(@key, $options->{die_on_missing_include} || 0);
+    push(@key, $options->{max_includes}           || 0);
+
     # compute the md5 and return it
-    return md5_hex(@key);
+    return $self->{cache_key} = md5_hex(join("\0", map { defined $_ ? $_ : '' } @key));
 }
 
 # generates MD5 from filepath to determine filename for cache file
@@ -1604,19 +1642,24 @@ sub _commit_to_file_cache {
     my $filepath = $options->{filepath};
     if (not defined $filepath) {
         $filepath = $self->_find_file($options->{filename});
-        confess("HTML::Template->new() : Cannot open included file $options->{filename} : file not found.")
+        confess("HTML::Template->new() : Cannot open template file $options->{filename} : file not found.")
           unless defined($filepath);
         $options->{filepath} = $filepath;
     }
 
     my ($cache_dir, $cache_file) = $self->_get_cache_filename($filepath);
     $cache_dir = File::Spec->join($options->{file_cache_dir}, $cache_dir);
+    # the -d/mkdir pairs tolerate another process creating the
+    # directory between the check and the call - under concurrent
+    # load losing that race is normal, not an error
     if (not -d $cache_dir) {
         if (not -d $options->{file_cache_dir}) {
             mkdir($options->{file_cache_dir}, $options->{file_cache_dir_mode})
+              or -d $options->{file_cache_dir}
               or croak("HTML::Template->new() : can't mkdir $options->{file_cache_dir} (file_cache => 1): $!");
         }
         mkdir($cache_dir, $options->{file_cache_dir_mode})
+          or -d $cache_dir
           or croak("HTML::Template->new() : can't mkdir $cache_dir (file_cache => 1): $!");
     }
 
@@ -1810,7 +1853,7 @@ sub _init_template {
         my $filepath = $options->{filepath};
         if (not defined $filepath) {
             $filepath = $self->_find_file($options->{filename});
-            confess("HTML::Template->new() : Cannot open included file $options->{filename} : file not found.")
+            confess("HTML::Template->new() : Cannot open template file $options->{filename} : file not found.")
               unless defined($filepath);
             # we'll need this for future reference - to call stat() for example.
             $options->{filepath} = $filepath;
@@ -1819,10 +1862,10 @@ sub _init_template {
         # use the open_mode if we have one
         if (my $mode = $options->{open_mode}) {
             open(TEMPLATE, $mode, $filepath)
-              || confess("HTML::Template->new() : Cannot open included file $filepath with mode $mode: $!");
+              || confess("HTML::Template->new() : Cannot open template file $filepath with mode $mode: $!");
         } else {
             open(TEMPLATE, $filepath)
-              or confess("HTML::Template->new() : Cannot open included file $filepath : $!");
+              or confess("HTML::Template->new() : Cannot open template file $filepath : $!");
         }
 
         $self->{mtime} = $self->_mtime($filepath);
@@ -2591,8 +2634,15 @@ sub _parse {
 sub _globalize_vars {
     my $self = shift;
 
+    # remember how many associate objects were already present so that
+    # _unglobalize_vars can restore the list to exactly this state
+    # instead of destroying it - the top-level list holds the
+    # user-supplied associate objects!
+    my $associate = $self->{options}{associate} ||= [];
+    $self->{pre_globalize_associate_count} = scalar @$associate;
+
     # associate with the loop (and top-level templates) above in the tree.
-    push(@{$self->{options}{associate}}, @_);
+    push(@$associate, @_);
 
     # recurse down into the template tree, adding ourself to the end of
     # list.
@@ -2606,8 +2656,12 @@ sub _globalize_vars {
 sub _unglobalize_vars {
     my $self = shift;
 
-    # disassociate
-    $self->{options}{associate} = undef;
+    # drop only the parent templates appended by _globalize_vars - this
+    # breaks the circular references while keeping any user-supplied
+    # associate objects
+    my $count = delete $self->{pre_globalize_associate_count};
+    splice(@{$self->{options}{associate}}, $count)
+      if defined $count;
 
     # recurse down into the template tree disassociating
     map   { $_->_unglobalize_vars() }
@@ -2786,7 +2840,7 @@ sub param {
         my $type = ref $value || '';
         if ($type eq 'REF') {
             croak("HTML::Template::param() : attempt to set parameter '$param' with a reference to a reference!");
-        } elsif ($type && ($type eq 'ARRAY' || ($type !~ /^(CODE)|(HASH)|(SCALAR)$/ && $value->isa('ARRAY')))) {
+        } elsif ($type && ($type eq 'ARRAY' || ($type !~ /^(?:CODE|HASH|SCALAR)$/ && $value->isa('ARRAY')))) {
             ref($param_map->{$param}) eq 'HTML::Template::LOOP'
               || croak(
                 "HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!");
@@ -3044,14 +3098,14 @@ sub output {
                 my $tmp_val;
                 if (ref($$line) eq 'CODE') {
                     $tmp_val = $$line->($self);
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
 
                     $$line = $tmp_val if $options->{cache_lazy_vars};
                 } else {
                     $tmp_val = $$line;
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
@@ -3073,13 +3127,13 @@ sub output {
                 my $tmp_val;
                 if (ref($$line) eq 'CODE') {
                     $tmp_val = $$line->($self);
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
                     $$line = $tmp_val if $options->{cache_lazy_vars};
                 } else {
                     $tmp_val = $$line;
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
@@ -3098,13 +3152,13 @@ sub output {
                 my $tmp_val;
                 if (ref($$line) eq 'CODE') {
                     $tmp_val = $$line->($self);
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : 'force_untaint' option but coderef returns tainted value");
                     }
                     $$line = $tmp_val if $options->{cache_lazy_vars};
                 } else {
                     $tmp_val = $$line;
-                    if ($options->{force_untaint} > 1 && tainted($_)) {
+                    if ($options->{force_untaint} > 1 && tainted($tmp_val)) {
                         croak("HTML::Template->output() : tainted value with 'force_untaint' option");
                     }
                 }
@@ -3112,6 +3166,11 @@ sub output {
                 unless (exists($URLESCAPE_MAP{chr(1)})) {
                     for (0 .. 255) { $URLESCAPE_MAP{chr($_)} = sprintf('%%%02X', $_); }
                 }
+                # the map covers single bytes only - characters above
+                # 0xFF must be turned into UTF-8 bytes first or they
+                # would be silently dropped (the escaped result is
+                # pure ASCII either way)
+                utf8::encode($tmp_val) if $tmp_val =~ /[^\x00-\xFF]/;
                 # do the translation (RFC 2396 ^uric)
                 $tmp_val =~ s!([^a-zA-Z0-9_.\-])!$URLESCAPE_MAP{$1}!g;
                 $result .= $tmp_val;
@@ -3126,6 +3185,12 @@ sub output {
 
     print STDERR "### HTML::Template Memory Debug ### END OUTPUT ", $self->{proc_mem}->size(), "\n"
       if $options->{memory_debug};
+
+    # if print_to's handle was itself tied we skipped tying $result and
+    # accumulated the output instead - deliver it now rather than
+    # silently discarding it
+    print {$args{print_to}} $result
+      if defined $args{print_to} && !tied $result;
 
     return undef if defined $args{print_to};
     return $result;
@@ -3322,8 +3387,19 @@ sub output {
         $self->[PARAM_SET] = $value_sets_array if $template->{options}->{cache_lazy_loops};
     }
 
+    my @context_vars = qw(__first__ __last__ __inner__ __outer__ __odd__ __even__ __counter__ __index__);
+
     foreach my $value_set (@$value_sets_array) {
+        my %saved_context;
         if ($loop_context_vars) {
+            # remember any pre-existing values for the context keys -
+            # output() is documented not to change state, and that
+            # includes the caller's loop data
+            foreach my $var (@context_vars) {
+                $saved_context{$var} = $value_set->{$var}
+                  if exists $value_set->{$var};
+            }
+
             if ($count == 0) {
                 @{$value_set}{qw(__first__ __inner__ __outer__ __last__)} = (1, 0, 1, $#{$value_sets_array} == 0);
             } elsif ($count == $#{$value_sets_array}) {
@@ -3333,15 +3409,18 @@ sub output {
             }
             $odd = $value_set->{__odd__} = !$odd;
             $value_set->{__even__} = !$odd;
-            
+
             $value_set->{__counter__} = $count + 1;
             $value_set->{__index__}   = $count;
         }
         $template->param($value_set);
         $result .= $template->output;
         $template->clear_params;
-        @{$value_set}{qw(__first__ __last__ __inner__ __outer__ __odd__ __even__ __counter__ __index__)} = (0, 0, 0, 0, 0, 0, 0)
-          if ($loop_context_vars);
+        if ($loop_context_vars) {
+            # put the caller's hash back exactly as we found it
+            delete @{$value_set}{@context_vars};
+            $value_set->{$_} = $saved_context{$_} for keys %saved_context;
+        }
         $count++;
     }
 
@@ -3442,7 +3521,7 @@ This same approach can be used for C<TMPL_LOOP>s too:
 
     <tmpl_if we_care>
       <tmpl_loop needles_in_haystack>
-        Found <tmpl_var __counter>!
+        Found <tmpl_var __counter__>!
       </tmpl_loop>
     </tmpl_if>
 
@@ -3465,7 +3544,7 @@ the loop in a conditional (C<TMPL_IF> or C<TMPL_UNLESS>). For instance:
     <tmpl_if we care>
       <tmpl_if needles_in_haystack>
           <tmpl_loop needles_in_haystack>
-            Found <tmpl_var __counter>!
+            Found <tmpl_var __counter__>!
           </tmpl_loop>
       <tmpl_else>
         No needles found!

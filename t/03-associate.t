@@ -1,13 +1,14 @@
 use strict;
 use warnings;
-use Test::More
-  # qw(no_plan)
-  tests => 7;
+use Test::More;
 
 BEGIN {
+    eval { require CGI; 1 }
+      or plan skip_all => 'CGI.pm required for these tests';
+    plan tests => 6;
     use_ok('HTML::Template');
-    use_ok('CGI', qw(:html3));
 }
+use CGI qw(:html3);
 
 my ($template, $q, %options);
 
