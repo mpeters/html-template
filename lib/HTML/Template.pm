@@ -1283,8 +1283,10 @@ sub new {
         croak("HTML::Template->new(): utf8 cannot be used in Perl < 5.7.1") if $] < 5.007001;
         croak("HTML::Template->new(): utf8 and open_mode cannot be used at the same time") if $options->{open_mode};
 
-        # utf8 is just a short-cut for a common open_mode
-        $options->{open_mode} = '<:encoding(utf8)';
+        # utf8 is just a short-cut for a common open_mode.  Note the
+        # strict "UTF-8" spelling: the lax "utf8" layer admits
+        # ill-formed sequences (e.g. surrogates) into the document.
+        $options->{open_mode} = '<:encoding(UTF-8)';
     }
 
     print STDERR "### HTML::Template Memory Debug ### POST CACHE INIT ", $self->{proc_mem}->size(), "\n"
