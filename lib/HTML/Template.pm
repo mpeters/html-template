@@ -1628,7 +1628,7 @@ sub _commit_to_file_cache {
     my $filepath = $options->{filepath};
     if (not defined $filepath) {
         $filepath = $self->_find_file($options->{filename});
-        confess("HTML::Template->new() : Cannot open included file $options->{filename} : file not found.")
+        confess("HTML::Template->new() : Cannot open template file $options->{filename} : file not found.")
           unless defined($filepath);
         $options->{filepath} = $filepath;
     }
@@ -1839,7 +1839,7 @@ sub _init_template {
         my $filepath = $options->{filepath};
         if (not defined $filepath) {
             $filepath = $self->_find_file($options->{filename});
-            confess("HTML::Template->new() : Cannot open included file $options->{filename} : file not found.")
+            confess("HTML::Template->new() : Cannot open template file $options->{filename} : file not found.")
               unless defined($filepath);
             # we'll need this for future reference - to call stat() for example.
             $options->{filepath} = $filepath;
@@ -1848,10 +1848,10 @@ sub _init_template {
         # use the open_mode if we have one
         if (my $mode = $options->{open_mode}) {
             open(TEMPLATE, $mode, $filepath)
-              || confess("HTML::Template->new() : Cannot open included file $filepath with mode $mode: $!");
+              || confess("HTML::Template->new() : Cannot open template file $filepath with mode $mode: $!");
         } else {
             open(TEMPLATE, $filepath)
-              or confess("HTML::Template->new() : Cannot open included file $filepath : $!");
+              or confess("HTML::Template->new() : Cannot open template file $filepath : $!");
         }
 
         $self->{mtime} = $self->_mtime($filepath);
