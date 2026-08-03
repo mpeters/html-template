@@ -3145,6 +3145,11 @@ sub output {
                 unless (exists($URLESCAPE_MAP{chr(1)})) {
                     for (0 .. 255) { $URLESCAPE_MAP{chr($_)} = sprintf('%%%02X', $_); }
                 }
+                # the map covers single bytes only - characters above
+                # 0xFF must be turned into UTF-8 bytes first or they
+                # would be silently dropped (the escaped result is
+                # pure ASCII either way)
+                utf8::encode($tmp_val) if $tmp_val =~ /[^\x00-\xFF]/;
                 # do the translation (RFC 2396 ^uric)
                 $tmp_val =~ s!([^a-zA-Z0-9_.\-])!$URLESCAPE_MAP{$1}!g;
                 $result .= $tmp_val;
