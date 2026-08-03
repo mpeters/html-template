@@ -3507,7 +3507,7 @@ This same approach can be used for C<TMPL_LOOP>s too:
 
     <tmpl_if we_care>
       <tmpl_loop needles_in_haystack>
-        Found <tmpl_var __counter>!
+        Found <tmpl_var __counter__>!
       </tmpl_loop>
     </tmpl_if>
 
@@ -3530,7 +3530,7 @@ the loop in a conditional (C<TMPL_IF> or C<TMPL_UNLESS>). For instance:
     <tmpl_if we care>
       <tmpl_if needles_in_haystack>
           <tmpl_loop needles_in_haystack>
-            Found <tmpl_var __counter>!
+            Found <tmpl_var __counter__>!
           </tmpl_loop>
       <tmpl_else>
         No needles found!
