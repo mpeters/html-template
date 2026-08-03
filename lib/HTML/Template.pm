@@ -1017,6 +1017,14 @@ specified.
 The specified filters will be called for any C<TMPL_INCLUDE>ed files just
 as they are for the main template file.
 
+B<NOTE>: since filters are code references they cannot be hashed into
+the cache key used by the caching options.  Only the I<number> of
+filters is included in the key.  If you share a cache between templates
+that use the same file with I<different> filter code (and the same
+number of filters), they will collide in the cache and you may get
+stale results.  Vary another keyed option (for example C<path>) if you
+need to keep them apart.
+
 =item * default_escape
 
 Set this parameter to a valid escape type (see the C<escape> option)
@@ -1496,10 +1504,14 @@ sub _commit_to_cache {
 
 # create a cache key from a template object.  The cache key includes
 # the full path to the template and options which affect template
-# loading.
+# loading.  The key is memoized on the object - _parse() deletes the
+# filter option when it finishes, so recomputing after a parse would
+# produce a different key than the one used to check the cache.
 sub _cache_key {
     my $self    = shift;
     my $options = $self->{options};
+
+    return $self->{cache_key} if defined $self->{cache_key};
 
     # assemble pieces of the key
     my @key = ($options->{filepath});
@@ -1510,8 +1522,18 @@ sub _cache_key {
     push(@key, $options->{global_vars}            || 0);
     push(@key, $options->{open_mode}              || 0);
 
+    # these also change the compiled parse_stack/param_map, so
+    # templates differing only in them must not share a cache slot.
+    # filters are coderefs so only their count can participate - see
+    # the note in the filter documentation.
+    push(@key, $options->{case_sensitive}              || 0);
+    push(@key, $options->{default_escape}              || '');
+    push(@key, $options->{vanguard_compatibility_mode} || 0);
+    push(@key, $options->{die_on_bad_params}           || 0);
+    push(@key, scalar @{$options->{filter} || []});
+
     # compute the md5 and return it
-    return md5_hex(@key);
+    return $self->{cache_key} = md5_hex(join("\0", map { defined $_ ? $_ : '' } @key));
 }
 
 # generates MD5 from filepath to determine filename for cache file
