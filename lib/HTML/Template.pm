@@ -1534,6 +1534,14 @@ sub _cache_key {
     push(@key, $options->{die_on_bad_params}           || 0);
     push(@key, scalar @{$options->{filter} || []});
 
+    # ... and these change whether parsing is allowed to succeed at
+    # all.  A cache hit skips _parse(), so it must never skip _parse's
+    # policy checks - e.g. no_includes refusing TMPL_INCLUDE.
+    push(@key, $options->{no_includes}            || 0);
+    push(@key, $options->{strict}                 || 0);
+    push(@key, $options->{die_on_missing_include} || 0);
+    push(@key, $options->{max_includes}           || 0);
+
     # compute the md5 and return it
     return $self->{cache_key} = md5_hex(join("\0", map { defined $_ ? $_ : '' } @key));
 }

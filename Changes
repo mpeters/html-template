@@ -3,10 +3,13 @@
 
     - Bug Fix: the cache key now includes all options that affect
       parsing (default_escape, case_sensitive, filter,
-      vanguard_compatibility_mode, die_on_bad_params). Previously
-      templates loaded from the same file with different settings
-      shared one cache slot - in the worst case turning
-      default_escape's escaping on or off for the wrong object.
+      vanguard_compatibility_mode, die_on_bad_params) and the
+      parse-policy options (no_includes, strict,
+      die_on_missing_include, max_includes). Previously templates
+      loaded from the same file with different settings shared one
+      cache slot - in the worst case turning default_escape's
+      escaping on or off for the wrong object, or letting a cache hit
+      bypass the no_includes security check entirely.
       NOTE: cache keys change, so existing file_cache directories
       will regenerate once after upgrading. [Sam Tregar]
 

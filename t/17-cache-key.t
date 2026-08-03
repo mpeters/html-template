@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 13;
 use lib("./t/testlib");
 
 use_ok('HTML::Template');
@@ -52,6 +52,16 @@ like($unfiltered->output, qr/%%BAR%%/, 'unfiltered object with same file+cache k
 my $capture = IO::Capture::Stderr->new();
 my ($t, $line) = capture_template($capture, {%base, filter => $filter, cache_debug => 1});
 like($line, qr/CACHE HIT/, 'identical filtered template gets a cache hit (key is memoized)');
+
+# parse-policy options: a cache hit must not bypass parse-time errors.
+# no_includes is the important one - it's a security control.
+my $permissive = HTML::Template->new(path => ['templates/'], filename => 'include.tmpl', cache => 1);
+eval { HTML::Template->new(path => ['templates/'], filename => 'include.tmpl', cache => 1, no_includes => 1) };
+like($@, qr/no_includes/, 'no_includes still croaks after a permissive object cached the template');
+
+my $lenient = HTML::Template->new(path => ['templates/'], filename => 'cache-key-strict.tmpl', cache => 1, strict => 0);
+eval { HTML::Template->new(path => ['templates/'], filename => 'cache-key-strict.tmpl', cache => 1) };
+like($@, qr/Syntax error/, 'strict still croaks after a lenient object cached the template');
 
 =head1 NAME
 
